@@ -2087,7 +2087,7 @@
         <h2 class="section-title">ПОДДЕРЖАТЬ МУЗЫКАНТА</h2>
         
         <div class="support-grid">
-            <!-- Карта через ЮMoney -->
+            <!-- БЛОК 1: Оплата по карте -->
             <div class="support-card">
                 <div class="support-icon">
                     <i class="fas fa-credit-card"></i>
@@ -2102,30 +2102,23 @@
                    class="pay-btn">
                     <i class="fas fa-credit-card"></i> ПЕРЕВЕСТИ С КАРТЫ
                 </a>
-                
-                <div class="support-description" style="font-size: 0.8rem; color: var(--text-color); margin-top: 1rem;">
-                    * Работает с карт РФ, Казахстана и других стран
-                </div>
             </div>
 
-            <!-- СБП -->
+            <!-- БЛОК 2: Оплата по QR -->
             <div class="support-card">
                 <div class="support-icon">
-                    <i class="fas fa-mobile-alt"></i>
+                    <i class="fas fa-qrcode"></i>
                 </div>
-                <div class="support-label">ОПЛАТА ПО СБП</div>
+                <div class="support-label">ОПЛАТА ПО QR</div>
                 <div class="support-description">
-                    Быстрый перевод через Систему Быстрых Платежей
+                    Отсканируйте QR-код для быстрой оплаты
                 </div>
                 
-                <a href="https://qr.nspk.ru/AS1000318F4J8OGS52AOM800N8N9T3H2A?type=01&bank=100000000007&sum=100&cur=RUB&crc=1C3B" 
-                   target="_blank" 
-                   class="pay-btn">
-                    <i class="fas fa-bolt"></i> ОПЛАТИТЬ ПО СБП
-                </a>
-                
-                <div class="support-description" style="font-size: 0.8rem; color: var(--text-color); margin-top: 1rem;">
-                    * Перевод на номер телефона через СБП
+                <!-- QR-код -->
+                <div style="text-align: center; margin: 1.5rem 0;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://yoomoney.ru/quickpay/sbp?receiver=4100118454141760&quickpay-form=shop&sum=100&targets=Поддержка%20BENZO&paymentType=sbp" 
+                         alt="QR-код для оплаты" 
+                         style="width: 180px; height: 180px; border-radius: 10px; border: 3px solid var(--primary-color);">
                 </div>
             </div>
         </div>
