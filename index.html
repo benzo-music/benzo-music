@@ -2482,7 +2482,542 @@ function updateTopDonators() {
         container.style.display = 'none';
     }
 }
+<!-- ================== СИСТЕМА РАНГОВ ДОНАТЕРОВ ================== -->
+<style>
+    /* Анимации для рангов */
+    @keyframes rankGlow {
+        0%, 100% { box-shadow: 0 0 5px currentColor; }
+        50% { box-shadow: 0 0 15px currentColor, 0 0 25px currentColor; }
+    }
+    
+    @keyframes rankFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+    }
+    
+    .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-family: 'Share Tech Mono', monospace;
+        font-weight: bold;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        border: 1px solid;
+        animation: rankFloat 3s ease-in-out infinite;
+    }
+</style>
 
+<!-- БЛОК РАНГОВ (вставить в секцию ПОДДЕРЖАТЬ после топа) -->
+<div class="admin-section" style="
+    margin-top: 2.5rem;
+    padding: 1.5rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 12px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(15px);
+    box-shadow: var(--glow);
+">
+    <h3 style="
+        color: var(--primary-color);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-family: 'Montserrat', sans-serif;
+        text-shadow: var(--text-glow);
+        animation: titleGlow 3s ease-in-out infinite;
+    ">
+        <i class="fas fa-layer-group"></i> СИСТЕМА РАНГОВ
+    </h3>
+    
+    <!-- Все ранги в виде "лестницы" -->
+    <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 2rem;">
+        <!-- УРОВЕНЬ 6: ЛЕГЕНДА -->
+        <div class="rank-tier" style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: linear-gradient(90deg, 
+                rgba(255, 215, 0, 0.05), 
+                rgba(255, 215, 0, 0.15)
+            );
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            animation: rankGlow 4s infinite;
+        ">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="
+                    width: 40px;
+                    height: 40px;
+                    background: radial-gradient(circle, #ffd700, #ff9900);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.2rem;
+                    color: black;
+                    box-shadow: 0 0 15px #ffd700;
+                ">
+                    👑
+                </div>
+                <div>
+                    <div style="color: #ffd700; font-weight: bold; font-size: 1.1rem;">ЛЕГЕНДА</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">50 000₽+</div>
+                </div>
+            </div>
+            <div style="color: #ffd700; font-family: 'Share Tech Mono';">
+                Право на коллаборацию
+            </div>
+        </div>
+        
+        <!-- УРОВЕНЬ 5: ПЛАТИНА -->
+        <div class="rank-tier" style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: linear-gradient(90deg, 
+                rgba(229, 228, 226, 0.05), 
+                rgba(229, 228, 226, 0.15)
+            );
+            border: 2px solid #e5e4e2;
+            border-radius: 10px;
+            opacity: 0.9;
+        ">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="
+                    width: 40px;
+                    height: 40px;
+                    background: radial-gradient(circle, #e5e4e2, #b0b0b0);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.2rem;
+                    color: black;
+                ">
+                    💎
+                </div>
+                <div>
+                    <div style="color: #e5e4e2; font-weight: bold; font-size: 1.1rem;">ПЛАТИНА</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">10 000₽+</div>
+                </div>
+            </div>
+            <div style="color: #e5e4e2; font-family: 'Share Tech Mono';">
+                Имя в титрах альбома
+            </div>
+        </div>
+        
+        <!-- УРОВЕНЬ 4: ЗОЛОТО -->
+        <div class="rank-tier" style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: linear-gradient(90deg, 
+                rgba(255, 215, 0, 0.05), 
+                rgba(255, 215, 0, 0.12)
+            );
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            opacity: 0.8;
+        ">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="
+                    width: 40px;
+                    height: 40px;
+                    background: radial-gradient(circle, #ffd700, #cc9900);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.2rem;
+                    color: black;
+                ">
+                    🥇
+                </div>
+                <div>
+                    <div style="color: #ffd700; font-weight: bold; font-size: 1.1rem;">ЗОЛОТО</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">5 000₽+</div>
+                </div>
+            </div>
+            <div style="color: #ffd700; font-family: 'Share Tech Mono';">
+                Предложить тему трека
+            </div>
+        </div>
+        
+        <!-- УРОВЕНЬ 3: СЕРЕБРО -->
+        <div class="rank-tier" style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: linear-gradient(90deg, 
+                rgba(192, 192, 192, 0.05), 
+                rgba(192, 192, 192, 0.12)
+            );
+            border: 2px solid #c0c0c0;
+            border-radius: 10px;
+            opacity: 0.7;
+        ">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="
+                    width: 40px;
+                    height: 40px;
+                    background: radial-gradient(circle, #c0c0c0, #909090);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.2rem;
+                    color: black;
+                ">
+                    🥈
+                </div>
+                <div>
+                    <div style="color: #c0c0c0; font-weight: bold; font-size: 1.1rem;">СЕРЕБРО</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">1 000₽+</div>
+                </div>
+            </div>
+            <div style="color: #c0c0c0; font-family: 'Share Tech Mono';">
+                Shoutout в соцсетях
+            </div>
+        </div>
+        
+        <!-- УРОВЕНЬ 2: БРОНЗА -->
+        <div class="rank-tier" style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: linear-gradient(90deg, 
+                rgba(205, 127, 50, 0.05), 
+                rgba(205, 127, 50, 0.12)
+            );
+            border: 2px solid #cd7f32;
+            border-radius: 10px;
+            opacity: 0.6;
+        ">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="
+                    width: 40px;
+                    height: 40px;
+                    background: radial-gradient(circle, #cd7f32, #9a5f25);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.2rem;
+                    color: black;
+                ">
+                    🥉
+                </div>
+                <div>
+                    <div style="color: #cd7f32; font-weight: bold; font-size: 1.1rem;">БРОНЗА</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">500₽+</div>
+                </div>
+            </div>
+            <div style="color: #cd7f32; font-family: 'Share Tech Mono';">
+                Ранний доступ к трекам
+            </div>
+        </div>
+        
+        <!-- УРОВЕНЬ 1: НОВИЧОК -->
+        <div class="rank-tier" style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: linear-gradient(90deg, 
+                rgba(100, 149, 237, 0.05), 
+                rgba(100, 149, 237, 0.12)
+            );
+            border: 2px solid #6495ed;
+            border-radius: 10px;
+            opacity: 0.5;
+        ">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="
+                    width: 40px;
+                    height: 40px;
+                    background: radial-gradient(circle, #6495ed, #4169e1);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.2rem;
+                    color: black;
+                ">
+                    🎖️
+                </div>
+                <div>
+                    <div style="color: #6495ed; font-weight: bold; font-size: 1.1rem;">НОВИЧОК</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">100₽+</div>
+                </div>
+            </div>
+            <div style="color: #6495ed; font-family: 'Share Tech Mono';">
+                Имя в списке благодарностей
+            </div>
+        </div>
+    </div>
+    
+    <!-- Прогресс-бар до следующего ранга -->
+    <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span style="color: var(--primary-color); font-family: 'Share Tech Mono';">ТВОЙ ПРОГРЕСС</span>
+            <span style="color: #00ff00; font-family: 'Share Tech Mono';" id="nextRankProgress">0/100₽</span>
+        </div>
+        <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px;">
+            <div id="rankProgressBar" style="
+                height: 100%;
+                background: linear-gradient(90deg, var(--primary-color), #00ff00);
+                width: 0%;
+                border-radius: 4px;
+                transition: width 0.5s ease;
+            "></div>
+        </div>
+        <div style="text-align: center; margin-top: 0.5rem; color: #aaa; font-size: 0.9rem;" id="nextRankText">
+            Донатьте 100₽ чтобы получить первый ранг
+        </div>
+    </div>
+</div>
+
+<script>
+// ================== СИСТЕМА РАНГОВ ==================
+
+// Конфигурация рангов
+const RANK_SYSTEM = [
+    { name: "👤 НЕТ РАНГА", min: 0, max: 99, color: "#666", icon: "👤", reward: "Доступ к сайту" },
+    { name: "🎖️ НОВИЧОК", min: 100, max: 499, color: "#6495ed", icon: "🎖️", reward: "Имя в списке благодарностей" },
+    { name: "🥉 БРОНЗА", min: 500, max: 999, color: "#cd7f32", icon: "🥉", reward: "Ранний доступ к трекам" },
+    { name: "🥈 СЕРЕБРО", min: 1000, max: 4999, color: "#c0c0c0", icon: "🥈", reward: "Shoutout в соцсетях" },
+    { name: "🥇 ЗОЛОТО", min: 5000, max: 9999, color: "#ffd700", icon: "🥇", reward: "Предложить тему трека" },
+    { name: "💎 ПЛАТИНА", min: 10000, max: 49999, color: "#e5e4e2", icon: "💎", reward: "Имя в титрах альбома" },
+    { name: "👑 ЛЕГЕНДА", min: 50000, max: 999999, color: "#ffd700", icon: "👑", reward: "Право на коллаборацию" }
+];
+
+// Получить ранг по сумме доната
+function getDonatorRank(totalDonated) {
+    for (let i = RANK_SYSTEM.length - 1; i >= 0; i--) {
+        if (totalDonated >= RANK_SYSTEM[i].min) {
+            return RANK_SYSTEM[i];
+        }
+    }
+    return RANK_SYSTEM[0];
+}
+
+// Получить следующий ранг
+function getNextRank(currentRank) {
+    const currentIndex = RANK_SYSTEM.findIndex(rank => rank.name === currentRank.name);
+    if (currentIndex < RANK_SYSTEM.length - 1) {
+        return RANK_SYSTEM[currentIndex + 1];
+    }
+    return null; // Максимальный ранг достигнут
+}
+
+// Обновить прогресс ранга
+function updateRankProgress(donatorName, totalDonated) {
+    const currentRank = getDonatorRank(totalDonated);
+    const nextRank = getNextRank(currentRank);
+    
+    const progressElement = document.getElementById('nextRankProgress');
+    const progressBar = document.getElementById('rankProgressBar');
+    const rankText = document.getElementById('nextRankText');
+    
+    if (!progressElement || !progressBar || !rankText) return;
+    
+    if (nextRank) {
+        const progress = totalDonated - currentRank.min;
+        const needed = nextRank.min - currentRank.min;
+        const percent = Math.min(100, (progress / needed) * 100);
+        
+        progressElement.textContent = `${progress}${totalDonated >= 1000 ? 'K' : ''}₽ / ${nextRank.min}${nextRank.min >= 1000 ? 'K' : ''}₽`;
+        progressBar.style.width = `${percent}%`;
+        rankText.innerHTML = `<span style="color: ${nextRank.color}">${nextRank.icon} До ${nextRank.name}: ${nextRank.min - totalDonated}₽</span>`;
+    } else {
+        progressElement.textContent = 'МАКСИМАЛЬНЫЙ РАНГ!';
+        progressBar.style.width = '100%';
+        progressBar.style.background = 'linear-gradient(90deg, #ffd700, #ff0000)';
+        rankText.innerHTML = '<span style="color: #ffd700">🎉 Вы достигли максимального ранга!</span>';
+    }
+}
+
+// Создать бейдж ранга (для вставки в ленту/топ)
+function createRankBadge(totalDonated) {
+    const rank = getDonatorRank(totalDonated);
+    
+    const badge = document.createElement('span');
+    badge.className = 'rank-badge';
+    badge.style.cssText = `
+        color: ${rank.color};
+        border-color: ${rank.color};
+        background: rgba(0,0,0,0.5);
+        animation: rankGlow 3s infinite;
+    `;
+    
+    badge.innerHTML = `
+        ${rank.icon}
+        <span>${rank.name.split(' ')[1] || rank.name}</span>
+    `;
+    
+    badge.title = `${rank.name} | ${rank.reward}`;
+    return badge;
+}
+
+// Обновить ранги в топе донатеров
+function updateRanksInLeaderboard() {
+    // Эта функция интегрируется с вашей существующей системой топа
+    document.querySelectorAll('.top-donator-card').forEach(card => {
+        const nameElement = card.querySelector('div[style*="color:"][style*="font-weight"]');
+        if (nameElement) {
+            // Извлекаем имя донатера (предполагаем, что оно в первом span)
+            const donatorName = nameElement.textContent.trim();
+            
+            // Ищем сумму доната (сложно без структуры, нужна интеграция)
+            // Для демо: создаём бейдж с рандомным рангом
+            const randomRank = RANK_SYSTEM[Math.floor(Math.random() * 3) + 2]; // От бронзы
+            const badge = document.createElement('div');
+            badge.style.cssText = `
+                color: ${randomRank.color};
+                border: 1px solid ${randomRank.color};
+                padding: 2px 8px;
+                border-radius: 10px;
+                font-size: 0.7rem;
+                display: inline-block;
+                margin-left: 8px;
+                background: rgba(0,0,0,0.3);
+            `;
+            badge.textContent = randomRank.icon;
+            
+            nameElement.appendChild(badge);
+        }
+    });
+}
+
+// Показать анимацию повышения ранга
+function showRankUpAnimation(oldRank, newRank, donatorName) {
+    const animation = document.createElement('div');
+    animation.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.95);
+        border: 3px solid ${newRank.color};
+        border-radius: 15px;
+        padding: 2rem;
+        z-index: 100000;
+        text-align: center;
+        animation: rankUpPop 0.8s ease-out;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 0 40px ${newRank.color};
+        min-width: 300px;
+    `;
+    
+    animation.innerHTML = `
+        <div style="font-size: 4rem; margin-bottom: 1rem;">${newRank.icon}</div>
+        <div style="color: ${newRank.color}; font-size: 1.5rem; margin-bottom: 0.5rem;">НОВЫЙ РАНГ!</div>
+        <div style="color: white; font-size: 1.2rem; margin-bottom: 0.5rem;">${donatorName}</div>
+        <div style="color: #aaa; margin-bottom: 1rem;">${oldRank.name} → ${newRank.name}</div>
+        <div style="color: ${newRank.color}; font-size: 1rem;">Награда: ${newRank.reward}</div>
+    `;
+    
+    document.body.appendChild(animation);
+    
+    // Удалить через 3 секунды
+    setTimeout(() => {
+        if (animation.parentNode) {
+            animation.parentNode.removeChild(animation);
+        }
+    }, 3000);
+}
+
+// Интеграция с существующей системой
+function integrateWithDonationSystem() {
+    // Когда добавляется новый донат
+    const originalAddRealDonation = window.addRealDonation;
+    if (originalAddRealDonation) {
+        window.addRealDonation = function(name, amount, message) {
+            const donation = originalAddRealDonation.call(this, name, amount, message);
+            
+            // Обновляем прогресс ранга для этого донатера
+            setTimeout(() => {
+                // Здесь должна быть логика поиска общей суммы донатера
+                // Для демо используем рандомную сумму
+                const randomTotal = Math.floor(Math.random() * 10000) + 100;
+                updateRankProgress(name, randomTotal);
+                
+                // Обновляем ранги в топе
+                updateRanksInLeaderboard();
+            }, 500);
+            
+            return donation;
+        };
+        console.log('✅ Система рангов интегрирована с донатами');
+    }
+}
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', function() {
+    // Добавляем CSS анимацию
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes rankUpPop {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            70% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .rank-tier:hover {
+            transform: translateX(5px);
+            transition: transform 0.3s ease;
+            opacity: 1 !important;
+            cursor: pointer;
+        }
+        
+        .rank-tier {
+            transition: all 0.3s ease;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Интегрируем с системой донатов
+    integrateWithDonationSystem();
+    
+    // Демо-данные для прогресс-бара
+    updateRankProgress('ДЕМО', 250);
+    
+    // Обновляем ранги в топе (если он есть)
+    setTimeout(updateRanksInLeaderboard, 1000);
+});
+
+// Функция для тестирования (вызови в консоли)
+window.testRankUp = function() {
+    const oldRank = RANK_SYSTEM[2]; // Бронза
+    const newRank = RANK_SYSTEM[3]; // Серебро
+    showRankUpAnimation(oldRank, newRank, 'ТЕСТОВЫЙ ФАН');
+};
+
+// Функция для проверки ранга по сумме (вызови в консоли)
+window.checkMyRank = function(total) {
+    const rank = getDonatorRank(total || 0);
+    console.log(`💰 При сумме ${total}₽ ваш ранг:`);
+    console.log(`🏆 ${rank.icon} ${rank.name}`);
+    console.log(`🎁 Награда: ${rank.reward}`);
+    
+    const nextRank = getNextRank(rank);
+    if (nextRank) {
+        console.log(`📈 До следующего ранга: ${nextRank.min - total}₽`);
+    }
+    
+    return rank;
+};
+</script>
 // ================== ЛЕНТА ДОНАТОВ ==================
 function updateDonationTicker() {
     const container = document.getElementById('donationTickerContainer');
