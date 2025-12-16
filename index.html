@@ -2106,45 +2106,56 @@
                 </div>
             </div>
         </div>
-   <!-- ЧИСТАЯ ЛАЙФ-ЛЕНТА ДОНАТОВ -->
-<div style="
-    margin: 2rem 0;
-    position: relative;
-    overflow: hidden;
-    background: rgba(0,0,0,0.3);
-    border-top: 1px solid var(--primary-color);
-    border-bottom: 1px solid var(--primary-color);
-    height: 60px;
-">
-    <!-- Бегущая строка донатов -->
-    <div id="donationTicker" style="
-        display: flex;
-        height: 100%;
-        align-items: center;
-        animation: tickerScroll 40s linear infinite;
+<!-- БЛОК ДОНАТОВ: ЛЕНТА + ТОП -->
+<div style="margin: 2rem 0;">
+
+    <!-- ТОП ДОНАТЕРОВ -->
+    <div id="topDonatorsContainer" style="
+        display: none;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: rgba(0,0,0,0.4);
+        border: 2px solid var(--primary-color);
+        border-radius: 10px;
+        text-align: center;
     ">
-        <!-- Донаты будут здесь -->
+        <h3 style="color: var(--primary-color); margin-bottom: 1rem; text-shadow: var(--text-glow);">
+            🏆 ТОП ДОНАТЕРОВ
+        </h3>
+        
+        <div id="topDonatorsList" style="
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        "></div>
+        
+        <div style="margin-top: 1rem; color: #aaa; font-size: 0.9rem;">
+            Всего собрано: <span id="totalDonated" style="color: #00ff00; font-weight: bold;">0 ₽</span>
+        </div>
     </div>
-    
-    <!-- Тень слева и справа -->
-    <div style="
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 100px;
-        background: linear-gradient(to right, var(--background-color), transparent);
-        z-index: 2;
-    "></div>
-    <div style="
-        position: absolute;
-        right: 0;
-        top: 0;
-        height: 100%;
-        width: 100px;
-        background: linear-gradient(to left, var(--background-color), transparent);
-        z-index: 2;
-    "></div>
+
+    <!-- ЛЕНТА ДОНАТОВ -->
+    <div id="donationTickerContainer" style="
+        position: relative;
+        overflow: hidden;
+        background: rgba(0,0,0,0.3);
+        border-top: 1px solid var(--primary-color);
+        border-bottom: 1px solid var(--primary-color);
+        height: 60px;
+        display: none;
+    ">
+        <div id="donationTicker" style="
+            display: flex;
+            height: 100%;
+            align-items: center;
+            animation: tickerScroll 40s linear infinite;
+        "></div>
+        
+        <div style="position: absolute; left: 0; top: 0; height: 100%; width: 80px; background: linear-gradient(to right, var(--background-color), transparent); z-index: 2;"></div>
+        <div style="position: absolute; right: 0; top: 0; height: 100%; width: 80px; background: linear-gradient(to left, var(--background-color), transparent); z-index: 2;"></div>
+    </div>
+
 </div>
 
 <style>
@@ -2153,122 +2164,273 @@
     100% { transform: translateX(-50%); }
 }
 
-@keyframes donateFlash {
-    0% { opacity: 0.3; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1); }
+@keyframes highlightTop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
 
-.donate-item {
-    animation: donateFlash 0.5s ease-out;
+.top-donator-card {
+    animation: highlightTop 0.5s ease-out;
 }
 </style>
 
 <script>
-// ИНИЦИАЛИЗАЦИЯ ДОНАТОВ
-let donations = [
-    { name: "Unknown", amount: 30 },
-    { name: "Dark", amount: 200 },
-    { name: "hq", amount: 100 },
-    { name: "RELAX", amount: 100 },
-    { name: "NN", amount: 30 },
-    { name: "Pull", amount: 20 },
-    { name: "Folk", amount: 20 },
-    { name: "Shadow", amount: 50 },
-    { name: "Kritik666", amount: 60 },
-    { name: "Xtern", amount: 35 }
-];
+// ================== ХРАНИЛИЩЕ ДОНАТОВ ==================
+let realDonations = [];
 
-// ЦВЕТА ПО СУММЕ
-function getDonationColor(amount) {
-    if (amount >= 100) return '#ffd700'; // золото
-    if (amount >= 50) return '#00ff00'; // зеленый
-    if (amount >= 30) return '#ff9900'; // оранжевый
-    return '#6495ed'; // синий
+// ================== ОСНОВНЫЕ ФУНКЦИИ ==================
+
+// ДОБАВЛЕНИЕ РЕАЛЬНОГО ДОНАТА
+function addRealDonation(name, amount, message = '') {
+    const donation = {
+        name: name || 'АНОН',
+        amount: amount,
+        message: message,
+        timestamp: Date.now(),
+        id: Date.now() + Math.random()
+    };
+    
+    realDonations.unshift(donation);
+    
+    if (realDonations.length > 100) {
+        realDonations = realDonations.slice(0, 100);
+    }
+    
+    saveDonations();
+    updateDonationUI();
+    showDonationNotification(donation);
+    
+    return donation;
 }
 
-// ИКОНКИ ПО СУММЕ
+// ОБНОВЛЕНИЕ ВСЕГО ИНТЕРФЕЙСА
+function updateDonationUI() {
+    updateTopDonators();
+    updateDonationTicker();
+    updateStats();
+}
+
+// ================== ТОП ДОНАТЕРОВ ==================
+function updateTopDonators() {
+    const container = document.getElementById('topDonatorsContainer');
+    const list = document.getElementById('topDonatorsList');
+    
+    if (!container || !list) return;
+    
+    if (realDonations.length > 0) {
+        container.style.display = 'block';
+        
+        const donatorsMap = {};
+        realDonations.forEach(d => {
+            if (!donatorsMap[d.name]) {
+                donatorsMap[d.name] = {
+                    name: d.name,
+                    total: 0,
+                    count: 0,
+                    lastAmount: d.amount,
+                    lastMessage: d.message
+                };
+            }
+            donatorsMap[d.name].total += d.amount;
+            donatorsMap[d.name].count += 1;
+        });
+        
+        const topDonators = Object.values(donatorsMap)
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 3);
+        
+        list.innerHTML = topDonators.map((donator, index) => {
+            const place = index + 1;
+            let placeEmoji = '🥉';
+            let placeColor = '#cd7f32';
+            
+            if (place === 1) {
+                placeEmoji = '🥇';
+                placeColor = '#ffd700';
+            } else if (place === 2) {
+                placeEmoji = '🥈';
+                placeColor = '#c0c0c0';
+            }
+            
+            return `
+                <div class="top-donator-card" style="
+                    background: rgba(0,0,0,0.6);
+                    border: 2px solid ${placeColor};
+                    border-radius: 10px;
+                    padding: 1rem;
+                    min-width: 180px;
+                    text-align: center;
+                ">
+                    <div style="font-size: 2em; margin-bottom: 0.5rem;">
+                        ${placeEmoji}
+                    </div>
+                    <div style="color: ${placeColor}; font-weight: bold; font-size: 1.2rem;">
+                        ${donator.name}
+                    </div>
+                    <div style="color: #00ff00; font-size: 1.5rem; font-weight: bold; margin: 0.5rem 0;">
+                        ${donator.total}₽
+                    </div>
+                    <div style="color: #aaa; font-size: 0.8rem;">
+                        ${donator.count} ${declOfNum(donator.count, ['донат', 'доната', 'донатов'])}
+                    </div>
+                    ${donator.lastMessage ? `
+                    <div style="color: #ccc; font-size: 0.8rem; margin-top: 0.5rem; font-style: italic;">
+                        "${donator.lastMessage}"
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+        
+    } else {
+        container.style.display = 'none';
+    }
+}
+
+// ================== ЛЕНТА ДОНАТОВ ==================
+function updateDonationTicker() {
+    const container = document.getElementById('donationTickerContainer');
+    const ticker = document.getElementById('donationTicker');
+    
+    if (!container || !ticker) return;
+    
+    if (realDonations.length > 0) {
+        container.style.display = 'block';
+        
+        const recentDonations = realDonations.slice(0, 20);
+        const displayDonations = recentDonations.length < 5 
+            ? [...recentDonations, ...recentDonations, ...recentDonations]
+            : [...recentDonations, ...recentDonations];
+        
+        ticker.innerHTML = displayDonations.map(donation => {
+            const color = getDonationColor(donation.amount);
+            const icon = getDonationIcon(donation.amount);
+            
+            return `
+                <div class="donate-item" style="
+                    display: flex;
+                    align-items: center;
+                    margin: 0 25px;
+                    padding: 8px 15px;
+                    background: rgba(0,0,0,0.5);
+                    border: 1px solid ${color};
+                    border-radius: 20px;
+                    color: ${color};
+                    font-family: 'Share Tech Mono';
+                    font-size: 0.9rem;
+                    white-space: nowrap;
+                    box-shadow: 0 0 10px ${color}20;
+                ">
+                    <span style="margin-right: 8px; font-size: 1.1em;">${icon}</span>
+                    <span style="color: white; margin-right: 10px;">${donation.name}</span>
+                    <span style="font-weight: bold; text-shadow: 0 0 5px ${color};">${donation.amount}₽</span>
+                </div>
+            `;
+        }).join('');
+        
+        const duration = 20 + (displayDonations.length * 3);
+        ticker.style.animationDuration = `${duration}s`;
+        
+    } else {
+        container.style.display = 'none';
+    }
+}
+
+// ================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==================
+function getDonationColor(amount) {
+    if (amount >= 1000) return '#ffd700';
+    if (amount >= 500) return '#00ff00';
+    if (amount >= 300) return '#ff9900';
+    return '#6495ed';
+}
+
 function getDonationIcon(amount) {
-    if (amount >= 100) return '👑';
-    if (amount >= 50) return '💰';
-    if (amount >= 30) return '🎁';
+    if (amount >= 1000) return '👑';
+    if (amount >= 500) return '💰';
+    if (amount >= 300) return '🎁';
     return '❤️';
 }
 
-// ОБНОВЛЕНИЕ ЛЕНТЫ
-function updateDonationTicker() {
-    const ticker = document.getElementById('donationTicker');
-    if (!ticker) return;
-    
-    // Дублируем для бесконечной прокрутки
-    const allDonations = [...donations, ...donations];
-    
-    ticker.innerHTML = allDonations.map(donation => {
-        const color = getDonationColor(donation.amount);
-        const icon = getDonationIcon(donation.amount);
-        
-        return `
-            <div class="donate-item" style="
-                display: flex;
-                align-items: center;
-                margin: 0 25px;
-                padding: 8px 15px;
-                background: rgba(0,0,0,0.5);
-                border: 1px solid ${color};
-                border-radius: 20px;
-                color: ${color};
-                font-family: 'Share Tech Mono';
-                font-size: 0.9rem;
-                white-space: nowrap;
-                box-shadow: 0 0 10px ${color}20;
-            ">
-                <span style="margin-right: 8px; font-size: 1.1em;">${icon}</span>
-                <span style="color: white; margin-right: 10px;">${donation.name}</span>
-                <span style="font-weight: bold; text-shadow: 0 0 5px ${color};">${donation.amount}₽</span>
-            </div>
-        `;
-    }).join('');
+function saveDonations() {
+    localStorage.setItem('benzo_real_donations', JSON.stringify(realDonations));
 }
 
-// АВТОМАТИЧЕСКИЕ ДОНАТЫ
-function startAutoDonations() {
-    // Добавляем новый донат каждые 30-120 секунд
-    setInterval(() => {
-        if (Math.random() > 0.5) { // 50% шанс
-            const names = ["Unknown", "Shadow", "hq", "NN", "Folk", "Xtern", "Kritik666", "Dark"];
-            const amounts = [10, 15, 20, 25, 30, 50, 70, 100];
-            
-            const newDonation = {
-                name: names[Math.floor(Math.random() * names.length)],
-                amount: amounts[Math.floor(Math.random() * amounts.length)]
-            };
-            
-            // Добавляем в начало
-            donations.unshift(newDonation);
-            
-            // Ограничиваем 20 донатами
-            if (donations.length > 20) {
-                donations = donations.slice(0, 20);
-            }
-            
-            // Обновляем ленту
-            updateDonationTicker();
-            
-            // Сохраняем
-            localStorage.setItem('benzo_donations_ticker', JSON.stringify(donations));
-        }
-    }, 30000 + Math.random() * 90000); // 30-120 секунд
-}
-
-// ЗАГРУЗКА
-document.addEventListener('DOMContentLoaded', function() {
-    // Пробуем загрузить сохраненные донаты
-    const saved = localStorage.getItem('benzo_donations_ticker');
+function loadDonations() {
+    const saved = localStorage.getItem('benzo_real_donations');
     if (saved) {
-        donations = JSON.parse(saved);
+        realDonations = JSON.parse(saved);
     }
+}
+
+function updateStats() {
+    const totalElement = document.getElementById('totalDonated');
+    if (!totalElement) return;
     
-    updateDonationTicker();
-    startAutoDonations();
+    const total = realDonations.reduce((sum, d) => sum + d.amount, 0);
+    totalElement.textContent = `${total} ₽`;
+}
+
+function showDonationNotification(donation) {
+    const notification = document.createElement('div');
+    const color = getDonationColor(donation.amount);
+    
+    notification.innerHTML = `
+        <div style="
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            border: 2px solid ${color};
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 10000;
+            animation: slideInRight 0.5s, fadeOut 3s 2.5s forwards;
+            min-width: 200px;
+            backdrop-filter: blur(10px);
+            font-family: 'Share Tech Mono';
+        ">
+            <div style="color: ${color}; font-weight: bold; font-size: 1.1em;">
+                ${getDonationIcon(donation.amount)} НОВЫЙ ДОНАТ ${donation.amount}₽
+            </div>
+            <div style="margin-top: 8px;">
+                <span style="color: white;">${donation.name}</span>
+                ${donation.message ? `<div style="font-size: 0.9em; color: #ccc; margin-top: 5px;">"${donation.message}"</div>` : ''}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 3000);
+}
+
+function declOfNum(number, titles) {
+    const cases = [2, 0, 1, 1, 1, 2];
+    return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
+}
+
+// ================== ИНИЦИАЛИЗАЦИЯ ==================
+document.addEventListener('DOMContentLoaded', function() {
+    loadDonations();
+    updateDonationUI();
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(100%); }
+        }
+    `;
+    document.head.appendChild(style);
 });
 </script>
     </section>
