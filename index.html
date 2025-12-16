@@ -2166,16 +2166,16 @@
 <script>
 // ИНИЦИАЛИЗАЦИЯ ДОНАТОВ
 let donations = [
-    { name: "АНОН", amount: 500 },
-    { name: "СЛУШАТЕЛЬ", amount: 200 },
-    { name: "ФАН", amount: 1000 },
-    { name: "ДРУГ", amount: 300 },
-    { name: "ГОСТЬ", amount: 150 },
-    { name: "ФОЛЛОВЕР", amount: 700 },
-    { name: "СОСЕД", amount: 250 },
-    { name: "МЕЛОМАН", amount: 450 },
-    { name: "ПОКЛОННИК", amount: 600 },
-    { name: "КРИТИК", amount: 350 }
+    { name: "Unknown", amount: 30 },
+    { name: "Dark", amount: 200 },
+    { name: "hq", amount: 100 },
+    { name: "RELAX", amount: 100 },
+    { name: "NN", amount: 30 },
+    { name: "Pull", amount: 20 },
+    { name: "Folk", amount: 20 },
+    { name: "Shadow", amount: 50 },
+    { name: "Kritik666", amount: 60 },
+    { name: "Xtern", amount: 35 }
 ];
 
 // ЦВЕТА ПО СУММЕ
@@ -2234,8 +2234,8 @@ function startAutoDonations() {
     // Добавляем новый донат каждые 30-120 секунд
     setInterval(() => {
         if (Math.random() > 0.5) { // 50% шанс
-            const names = ["АНОН", "СЛУШАТЕЛЬ", "ФАН", "ДРУГ", "ГОСТЬ", "ФОЛЛОВЕР", "СОСЕД", "МЕЛОМАН"];
-            const amounts = [100, 150, 200, 250, 300, 500, 700, 1000];
+            const names = ["Unknown", "Shadow", "hq", "NN", "Folk", "Xtern", "Kritik666", "Dark"];
+            const amounts = [10, 15, 20, 25, 30, 50, 70, 100];
             
             const newDonation = {
                 name: names[Math.floor(Math.random() * names.length)],
