@@ -2071,197 +2071,195 @@
         <h2 class="section-title">ПОДДЕРЖАТЬ МУЗЫКАНТА</h2>
         
         <div class="support-grid">
-          <!-- ЦЕЛЬ ДОНАТОВ (ЧИСТАЯ ВИЗУАЛИЗАЦИЯ) -->
-<div style="
-    background: rgba(0, 0, 0, 0.6);
+     
+    <!-- ЦЕЛЬ ДОНАТОВ В СТИЛЕ САЙТА -->
+<div class="goal-container" style="
+    background: rgba(0,0,0,0.7);
     border: 2px solid var(--primary-color);
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 1.5rem;
     margin: 2rem auto;
-    max-width: 600px;
-    text-align: center;
-    box-shadow: var(--glow);
+    max-width: 800px;
     backdrop-filter: blur(10px);
+    box-shadow: var(--glow);
+    position: relative;
+    overflow: hidden;
 ">
-    <!-- Заголовок цели -->
+    <!-- Киберизация -->
+    <div style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--primary-color));
+        animation: scanLine 2s linear infinite;
+    "></div>
+    
     <h3 style="
         color: var(--primary-color);
-        margin-bottom: 1rem;
+        text-align: center;
+        margin-bottom: 1.2rem;
         font-family: 'Montserrat', sans-serif;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
         text-shadow: var(--text-glow);
+        font-size: 1.5rem;
     ">
-        🎯 ЦЕЛЬ: Выход на новый уровень!
+        <i class="fas fa-bullseye" style="margin-right: 10px;"></i>
+        ЦЕЛЬ: НОВЫЙ УРОВЕНЬ!
     </h3>
     
-    <!-- Описание -->
-    <p style="
-        color: var(--text-color);
-        margin-bottom: 1.5rem;
-        font-family: 'Share Tech Mono', monospace;
-        line-height: 1.5;
-        opacity: 0.9;
-    ">
-        Нужно <strong style="color: #00ff00;">100 000₽</strong> на студийную запись, сведение и мастеринг.
-        Каждый донатер получит трек на 24 часа раньше релиза!
-    </p>
-    
-    <!-- Прогресс-бар -->
+    <!-- Прогресс в кибер-стиле -->
     <div style="margin-bottom: 1.5rem;">
         <div style="
             display: flex;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.9rem;
         ">
-            <span style="color: var(--primary-color);">Собрано</span>
-            <span style="color: #00ff00;"><span id="collectedAmount">0</span>₽ из 100 000₽</span>
+            <span style="color: var(--text-color);">
+                <i class="fas fa-satellite-dish" style="margin-right: 8px; color: var(--primary-color);"></i>
+                СБОР СРЕДСТВ АКТИВИРОВАН
+            </span>
+            <span style="color: var(--accent-color); font-weight: bold;">
+                <span id="collectedAmount">0</span>₽ / <span style="color: var(--primary-color);">100 000₽</span>
+            </span>
         </div>
         
+        <!-- Прогресс-бар в стиле сайта -->
         <div style="
-            height: 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
             overflow: hidden;
             border: 1px solid var(--primary-color);
+            position: relative;
         ">
             <div id="progressBar" style="
                 height: 100%;
-                background: linear-gradient(90deg, var(--primary-color), #00ff00);
+                background: linear-gradient(90deg, 
+                    var(--primary-color) 0%, 
+                    var(--accent-color) 50%, 
+                    var(--primary-color) 100%);
                 width: 0%;
-                border-radius: 8px;
                 transition: width 0.5s ease;
-                box-shadow: 0 0 10px var(--primary-color);
+                position: relative;
+            ">
+                <div style="
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    height: 100%;
+                    width: 3px;
+                    background: white;
+                    box-shadow: 0 0 10px white;
+                    animation: pulse 1s infinite;
+                "></div>
+            </div>
+            
+            <!-- Сетка поверх -->
+            <div style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: 
+                    linear-gradient(90deg, transparent 95%, rgba(255,255,255,0.1) 100%),
+                    linear-gradient(0deg, transparent 95%, rgba(255,255,255,0.1) 100%);
+                background-size: 20px 20px;
+                pointer-events: none;
             "></div>
         </div>
         
-        <!-- Процент выполнения -->
         <div style="
-            text-align: right;
-            margin-top: 0.3rem;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.8rem;
-            color: #aaa;
+            color: var(--text-color);
+            opacity: 0.8;
         ">
+            <span>0%</span>
             <span id="progressPercent">0%</span>
+            <span>100%</span>
         </div>
     </div>
     
-    <!-- Бонусы (просто текст, не кнопки) -->
+    <!-- Инфо-блок в стиле трека -->
     <div style="
-        margin-top: 1.5rem;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(var(--primary-color-rgb), 0.3);
         border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    ">
-        <h4 style="color: var(--primary-color); margin-bottom: 0.8rem; font-size: 1rem;">
-            🎁 Что получают донатеры:
-        </h4>
-        <ul style="
-            color: var(--text-color);
-            text-align: left;
-            padding-left: 1.5rem;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            opacity: 0.9;
-        ">
-            <li><strong style="color: #6495ed;">100+₽</strong> — Имя в списке благодарностей</li>
-            <li><strong style="color: #ff9900;">500+₽</strong> — Ранний доступ к треку</li>
-            <li><strong style="color: #ffd700;">1000+₽</strong> — Личная благодарность в соцсетях</li>
-            <li><strong style="color: #00ff00;">5000+₽</strong> — Возможность предложить тему для трека</li>
-        </ul>
-    </div>
-    
-    <!-- Пояснение -->
-    <p style="
-        margin-top: 1rem;
-        color: #aaa;
+        padding: 1rem;
+        margin-top: 1.5rem;
         font-family: 'Share Tech Mono', monospace;
-        font-size: 0.8rem;
-        font-style: italic;
     ">
-        ↓ Используйте кнопки или QR-код ниже для перевода ↓
-    </p>
+        <div style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 0.9rem;">
+            <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+            СПЕЦИФИКАЦИЯ ЦЕЛИ:
+        </div>
+        <div style="color: var(--text-color); font-size: 0.85rem; line-height: 1.5;">
+            • СТУДИЙНАЯ ЗАПИСЬ (8 часов)<br>
+            • СВЕДЕНИЕ И МАСТЕРИНГ<br>
+            • КАЖДЫЙ ДОНАТЕР → РАННИЙ ДОСТУП (-24ч)<br>
+        </div>
+    </div>
 </div>
 
-<script>
-// ===== НАСТРОЙКИ ЦЕЛИ =====
-const GOAL_AMOUNT = 100000; // Общая цель в рублях
-let currentAmount = 0;     // Текущая собранная сумма
-
-// ===== ФУНКЦИИ =====
-
-// Загрузка сохраненного прогресса
-function loadProgress() {
-    const saved = localStorage.getItem('benzo_goal_progress');
-    if (saved) {
-        currentAmount = parseInt(saved);
-        updateProgress();
-    }
+<style>
+@keyframes scanLine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
-// Обновление прогресс-бара
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+</style>
+
+<script>
+// Тот же скрипт, но в стиле
+const GOAL_AMOUNT = 100000;
+let currentAmount = 0;
+
+function loadProgress() {
+    const saved = localStorage.getItem('benzo_goal_progress');
+    if (saved) currentAmount = parseInt(saved);
+    updateProgress();
+}
+
 function updateProgress() {
     const percent = Math.min(100, (currentAmount / GOAL_AMOUNT) * 100);
-    
-    // Обновляем элементы
     document.getElementById('collectedAmount').textContent = currentAmount.toLocaleString();
     document.getElementById('progressBar').style.width = percent + '%';
     document.getElementById('progressPercent').textContent = Math.round(percent) + '%';
-    
-    // Сохраняем
     localStorage.setItem('benzo_goal_progress', currentAmount);
     
-    // Эффект при достижении цели
     if (currentAmount >= GOAL_AMOUNT) {
-        document.getElementById('progressBar').style.background = 'linear-gradient(90deg, #ffd700, #ff9900)';
-        document.querySelector('h3').innerHTML = '🎉 ЦЕЛЬ ДОСТИГНУТА! Спасибо всем!';
+        document.getElementById('progressBar').style.animation = 'none';
+        document.querySelector('h3').innerHTML = '<i class="fas fa-check-circle" style="margin-right: 10px; color: #00ff00;"></i> ЦЕЛЬ ДОСТИГНУТА! СИСТЕМА ГОТОВА К ЗАПУСКУ';
     }
 }
 
-// Ручное добавление суммы (для админа)
 function addToGoal(amount) {
-    if (!isAdmin()) { // Проверка что это админ
-        console.log('❌ Только админ может обновлять цель');
+    if (localStorage.getItem('benzo_admin') !== 'true' && 
+        localStorage.getItem('benzo_super_admin') !== 'true') {
+        console.log('ACCESS DENIED: Admin privileges required');
         return;
     }
-    
     currentAmount += parseInt(amount);
     updateProgress();
-    console.log(`✅ Добавлено ${amount}₽ к цели. Всего: ${currentAmount}₽`);
+    console.log(`[SYSTEM] +${amount}₽ added. Total: ${currentAmount}₽`);
 }
 
-// Проверка админа (использует твою систему)
-function isAdmin() {
-    return localStorage.getItem('benzo_admin') === 'true' || 
-           localStorage.getItem('benzo_super_admin') === 'true';
-}
-
-// Инициализация
-document.addEventListener('DOMContentLoaded', function() {
-    loadProgress();
-    
-    // Авто-обновление каждые 10 секунд (на случай если меняют в другом окне)
-    setInterval(loadProgress, 10000);
-});
+document.addEventListener('DOMContentLoaded', loadProgress);
 </script>
-
-<style>
-/* Анимация пульсации прогресс-бара */
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.8; }
-    100% { opacity: 1; }
-}
-
-#progressBar {
-    animation: pulse 3s infinite;
-}
-</style>
             <!-- БЛОК 1: Оплата по карте -->
             <div class="support-card">
                 <div class="support-icon">
