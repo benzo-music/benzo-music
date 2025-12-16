@@ -2071,7 +2071,7 @@
         <h2 class="section-title">ПОДДЕРЖАТЬ МУЗЫКАНТА</h2>
         
         <div class="support-grid">
-            <!-- ЦЕЛЬ ДОНАТОВ -->
+          <!-- ЦЕЛЬ ДОНАТОВ (ЧИСТАЯ ВИЗУАЛИЗАЦИЯ) -->
 <div style="
     background: rgba(0, 0, 0, 0.6);
     border: 2px solid var(--primary-color);
@@ -2092,7 +2092,7 @@
         letter-spacing: 1px;
         text-shadow: var(--text-glow);
     ">
-        🎯 ЦЕЛЬ: НОВЫЙ ТРЕК «NEON DREAMS»
+        🎯 ЦЕЛЬ: Выход на новый уровень!
     </h3>
     
     <!-- Описание -->
@@ -2103,7 +2103,7 @@
         line-height: 1.5;
         opacity: 0.9;
     ">
-        Нужно <strong style="color: #00ff00;">15 000₽</strong> на студийную запись, сведение и мастеринг.
+        Нужно <strong style="color: #00ff00;">100 000₽</strong> на студийную запись, сведение и мастеринг.
         Каждый донатер получит трек на 24 часа раньше релиза!
     </p>
     
@@ -2117,7 +2117,7 @@
             font-size: 0.9rem;
         ">
             <span style="color: var(--primary-color);">Собрано</span>
-            <span style="color: #00ff00;"><span id="collectedAmount">0</span>₽ из 15 000₽</span>
+            <span style="color: #00ff00;"><span id="collectedAmount">0</span>₽ из 100 000₽</span>
         </div>
         
         <div style="
@@ -2149,78 +2149,48 @@
         </div>
     </div>
     
-    <!-- Уровни поддержки -->
+    <!-- Бонусы (просто текст, не кнопки) -->
     <div style="
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 1rem;
         margin-top: 1.5rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     ">
-        <div class="tier-card" style="
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #6495ed;
-            border-radius: 8px;
-            padding: 1rem;
-            transition: all 0.3s ease;
-        " onclick="suggestDonation(100)">
-            <div style="font-size: 1.5rem; color: #6495ed; margin-bottom: 0.5rem;">☕</div>
-            <div style="color: white; font-weight: bold; margin-bottom: 0.3rem;">На кофе</div>
-            <div style="color: #00ff00; font-size: 1.2rem; margin-bottom: 0.5rem;">100₽</div>
-            <div style="color: #aaa; font-size: 0.8rem;">Имя в списке благодарностей</div>
-        </div>
-        
-        <div class="tier-card" style="
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #ff9900;
-            border-radius: 8px;
-            padding: 1rem;
-            transition: all 0.3s ease;
-        " onclick="suggestDonation(500)">
-            <div style="font-size: 1.5rem; color: #ff9900; margin-bottom: 0.5rem;">🎵</div>
-            <div style="color: white; font-weight: bold; margin-bottom: 0.3rem;">Со-продюсер</div>
-            <div style="color: #00ff00; font-size: 1.2rem; margin-bottom: 0.5rem;">500₽</div>
-            <div style="color: #aaa; font-size: 0.8rem;">Ранний доступ к треку</div>
-        </div>
-        
-        <div class="tier-card" style="
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #ffd700;
-            border-radius: 8px;
-            padding: 1rem;
-            transition: all 0.3s ease;
-        " onclick="suggestDonation(1000)">
-            <div style="font-size: 1.5rem; color: #ffd700; margin-bottom: 0.5rem;">🚀</div>
-            <div style="color: white; font-weight: bold; margin-bottom: 0.3rem;">Запускатель</div>
-            <div style="color: #00ff00; font-size: 1.2rem; margin-bottom: 0.5rem;">1000₽</div>
-            <div style="color: #aaa; font-size: 0.8rem;">Личная благодарность в соцсетях</div>
-        </div>
+        <h4 style="color: var(--primary-color); margin-bottom: 0.8rem; font-size: 1rem;">
+            🎁 Что получают донатеры:
+        </h4>
+        <ul style="
+            color: var(--text-color);
+            text-align: left;
+            padding-left: 1.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        ">
+            <li><strong style="color: #6495ed;">100+₽</strong> — Имя в списке благодарностей</li>
+            <li><strong style="color: #ff9900;">500+₽</strong> — Ранний доступ к треку</li>
+            <li><strong style="color: #ffd700;">1000+₽</strong> — Личная благодарность в соцсетях</li>
+            <li><strong style="color: #00ff00;">5000+₽</strong> — Возможность предложить тему для трека</li>
+        </ul>
     </div>
     
-    <!-- Кнопка быстрого доната -->
-    <button onclick="quickDonate()" style="
-        background: linear-gradient(45deg, var(--primary-color), #00ff00);
-        color: black;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 25px;
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 800;
-        font-size: 1rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        cursor: pointer;
-        margin-top: 1.5rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 0 15px var(--primary-color);
-    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 20px var(--primary-color)'" 
-    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 15px var(--primary-color)'">
-        💰 ПОДДЕРЖАТЬ ЦЕЛЬ
-    </button>
+    <!-- Пояснение -->
+    <p style="
+        margin-top: 1rem;
+        color: #aaa;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.8rem;
+        font-style: italic;
+    ">
+        ↓ Используйте кнопки или QR-код ниже для перевода ↓
+    </p>
 </div>
 
 <script>
 // ===== НАСТРОЙКИ ЦЕЛИ =====
-const GOAL_AMOUNT = 15000; // Общая цель в рублях
+const GOAL_AMOUNT = 100000; // Общая цель в рублях
 let currentAmount = 0;     // Текущая собранная сумма
 
 // ===== ФУНКЦИИ =====
@@ -2253,95 +2223,43 @@ function updateProgress() {
     }
 }
 
-// Добавление доната к цели
+// Ручное добавление суммы (для админа)
 function addToGoal(amount) {
-    currentAmount += amount;
+    if (!isAdmin()) { // Проверка что это админ
+        console.log('❌ Только админ может обновлять цель');
+        return;
+    }
+    
+    currentAmount += parseInt(amount);
     updateProgress();
-    
-    // Анимация
-    const bar = document.getElementById('progressBar');
-    bar.style.transform = 'scaleY(1.2)';
-    setTimeout(() => bar.style.transform = 'scaleY(1)', 300);
-    
     console.log(`✅ Добавлено ${amount}₽ к цели. Всего: ${currentAmount}₽`);
 }
 
-// Предложение суммы для доната
-function suggestDonation(amount) {
-    const message = `Поддержать цель на ${amount}₽?\n\nБонус: ${
-        amount >= 1000 ? 'Личная благодарность в соцсетях' :
-        amount >= 500 ? 'Ранний доступ к треку' :
-        'Имя в списке благодарностей'
-    }`;
-    
-    if (confirm(message)) {
-        addToGoal(amount);
-        
-        // Показываем QR-код/напоминаем про донат
-        setTimeout(() => {
-            alert(`🎯 Отлично! Теперь переведите ${amount}₽ по QR-коду или кнопке ниже. После оплаты вы попадёте в топ донатеров!`);
-        }, 300);
-    }
+// Проверка админа (использует твою систему)
+function isAdmin() {
+    return localStorage.getItem('benzo_admin') === 'true' || 
+           localStorage.getItem('benzo_super_admin') === 'true';
 }
 
-// Быстрый донат
-function quickDonate() {
-    const amount = prompt('Введите сумму доната (₽):', '500');
-    if (amount && !isNaN(amount) && amount > 0) {
-        const numAmount = parseInt(amount);
-        addToGoal(numAmount);
-        alert(`Спасибо! Переведите ${numAmount}₽ любым удобным способом.`);
-    }
-}
-
-// Автоматическое добавление донатов из ленты
-function syncWithDonationFeed() {
-    // Эта функция будет связана с вашей лентой донатов
-    // Пока заглушка - при добавлении доната через addRealDonation можно вызывать addToGoal()
-    console.log('Для связи с лентой: при реальном донате вызови addToGoal(сумма)');
-}
-
-// Инициализация при загрузке
+// Инициализация
 document.addEventListener('DOMContentLoaded', function() {
     loadProgress();
     
-    // Эффекты при наведении на уровни
-    document.querySelectorAll('.tier-card').forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-            this.style.boxShadow = '0 5px 15px rgba(255,255,255,0.1)';
-        });
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = 'none';
-        });
-    });
-    
-    // Связь с существующей лентой донатов (если есть)
-    if (typeof realDonations !== 'undefined') {
-        console.log('✅ Лента донатов найдена, можно синхронизировать');
-    }
+    // Авто-обновление каждые 10 секунд (на случай если меняют в другом окне)
+    setInterval(loadProgress, 10000);
 });
-
-// ===== ДЛЯ РУЧНОГО УПРАВЛЕНИЯ =====
-// Чтобы вручную добавить сумму к цели, выполни в консоли:
-// addToGoal(500); // Добавит 500₽ к прогрессу
 </script>
 
 <style>
-.tier-card:hover {
-    cursor: pointer;
-}
-
-/* Анимация пульсации при обновлении прогресса */
+/* Анимация пульсации прогресс-бара */
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
+    0% { opacity: 1; }
+    50% { opacity: 0.8; }
+    100% { opacity: 1; }
 }
 
 #progressBar {
-    animation: pulse 2s infinite;
+    animation: pulse 3s infinite;
 }
 </style>
             <!-- БЛОК 1: Оплата по карте -->
