@@ -2296,7 +2296,7 @@ document.addEventListener('DOMContentLoaded', loadProgress);
             </div>
         </div>
 
-<!-- ================== СИСТЕМА РАНГОВ В СТИЛЕ САЙТА ================== -->
+<!-- ================== ОБНОВЛЕННАЯ СИСТЕМА РАНГОВ ================== -->
 <div style="
     margin: 2rem 0;
     padding: 1.5rem;
@@ -2331,7 +2331,7 @@ document.addEventListener('DOMContentLoaded', loadProgress);
             font-size: 0.9rem;
             margin-top: 0.5rem;
         ">
-            Чем больше поддержка — выше статус
+            Ваш прогресс сохраняется автоматически
         </div>
     </div>
 
@@ -2342,6 +2342,63 @@ document.addEventListener('DOMContentLoaded', loadProgress);
         gap: 1rem;
         margin-bottom: 1.5rem;
     ">
+        <!-- Ранг 0: НЕТ РАНГА -->
+        <div class="rank-card" style="
+            background: rgba(102, 102, 102, 0.08);
+            border: 1px solid #666;
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+        ">
+            <div style="
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                font-size: 1.2rem;
+                color: #666;
+                opacity: 0.7;
+            ">
+                👤
+            </div>
+            <div style="
+                font-size: 0.8rem;
+                color: #666;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 0.5rem;
+                font-weight: bold;
+            ">
+                НАЧАЛЬНЫЙ УРОВЕНЬ
+            </div>
+            <div style="
+                color: #fff;
+                font-size: 1.1rem;
+                font-weight: bold;
+                margin-bottom: 0.3rem;
+            ">
+                БЕЗ РАНГА
+            </div>
+            <div style="
+                color: #666;
+                font-size: 1rem;
+                font-weight: bold;
+                margin-bottom: 0.8rem;
+            ">
+                0₽ - 99₽
+            </div>
+            <div style="
+                color: rgba(255,255,255,0.7);
+                font-size: 0.85rem;
+                line-height: 1.4;
+                border-top: 1px solid rgba(102, 102, 102, 0.3);
+                padding-top: 0.8rem;
+            ">
+                • Просмотр сайта<br>
+                • Прослушивание музыки
+            </div>
+        </div>
+
         <!-- Ранг 1: НОВИЧОК -->
         <div class="rank-card" style="
             background: rgba(100, 149, 237, 0.08);
@@ -2690,13 +2747,46 @@ document.addEventListener('DOMContentLoaded', loadProgress);
     </div>
 
     <!-- Прогресс текущего пользователя -->
-    <div style="
+    <div id="rankProgressContainer" style="
         background: rgba(255,255,255,0.05);
         border: 1px solid rgba(255,255,255,0.2);
         border-radius: 8px;
         padding: 1rem;
         margin-top: 1rem;
     ">
+        <!-- Поле для ввода имени -->
+        <div style="
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        ">
+            <input type="text" 
+                   id="donorNameInput" 
+                   placeholder="Введите ваше имя для донатов" 
+                   style="
+                       flex: 1;
+                       padding: 0.6rem;
+                       background: rgba(255,255,255,0.1);
+                       border: 1px solid var(--primary-color);
+                       border-radius: 6px;
+                       color: white;
+                       font-family: 'Share Tech Mono';
+                   ">
+            <button onclick="saveDonorName()" style="
+                padding: 0.6rem 1rem;
+                background: var(--primary-color);
+                color: black;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-family: 'Share Tech Mono';
+                font-weight: bold;
+            ">
+                Сохранить
+            </button>
+        </div>
+        
         <div style="
             display: flex;
             justify-content: space-between;
@@ -2705,7 +2795,7 @@ document.addEventListener('DOMContentLoaded', loadProgress);
             font-size: 0.9rem;
         ">
             <span>ВАШ ПРОГРЕСС</span>
-            <span id="currentRankText">🎖️ НОВИЧОК (0/100₽)</span>
+            <span id="currentRankText">👤 НЕТ РАНГА (0/100₽)</span>
         </div>
         <div style="
             height: 6px;
@@ -2744,6 +2834,12 @@ document.addEventListener('DOMContentLoaded', loadProgress);
     to { transform: translateY(-3px); }
 }
 
+@keyframes rankUpgrade {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
 .rank-card {
     transition: all 0.3s ease;
 }
@@ -2752,10 +2848,14 @@ document.addEventListener('DOMContentLoaded', loadProgress);
     animation: cardHover 0.3s ease forwards;
     box-shadow: var(--soft-glow);
 }
+
+.rank-upgrade {
+    animation: rankUpgrade 0.5s ease;
+}
 </style>
 
 <script>
-// ================== СИСТЕМА РАНГОВ (JS) ==================
+// ================== ОБНОВЛЕННАЯ СИСТЕМА РАНГОВ (JS) ==================
 const RANKS = [
     { name: "НОВИЧОК", min: 100, max: 499, color: "#6495ed", icon: "🎖️", level: 1 },
     { name: "БРОНЗА", min: 500, max: 999, color: "#cd7f32", icon: "🥉", level: 2 },
@@ -2765,23 +2865,219 @@ const RANKS = [
     { name: "ЛЕГЕНДА", min: 50000, max: 999999, color: "#ffd700", icon: "👑", level: 6 }
 ];
 
-// Получить ранг по сумме
-function getRankByAmount(amount) {
-    for (let i = RANKS.length - 1; i >= 0; i--) {
-        if (amount >= RANKS[i].min) {
-            return RANKS[i];
-        }
+// Глобальные переменные для системы рангов
+let userDonationTotals = {};
+let userCurrentRank = {};
+
+// ================== ФУНКЦИИ ДЛЯ СИСТЕМЫ РАНГОВ ==================
+
+// Генерация ID пользователя
+function getOrCreateDonorId() {
+    let donorId = localStorage.getItem('benzo_donor_id');
+    if (!donorId) {
+        donorId = 'donor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('benzo_donor_id', donorId);
+        
+        // Создаем начальную запись
+        userDonationTotals[donorId] = {
+            name: "Анонимный донатер",
+            total: 0,
+            count: 0,
+            rank: getRankByAmount(0)
+        };
+        saveUserTotals();
     }
-    return { name: "НЕТ РАНГА", min: 0, color: "#666", icon: "👤", level: 0 };
+    return donorId;
 }
 
-// Обновить прогресс пользователя
-function updateRankProgress() {
-    // В реальном проекте здесь брали бы общую сумму донатов пользователя
-    // Для демо используем случайную сумму
-    const demoAmount = Math.floor(Math.random() * 60000);
-    const currentRank = getRankByAmount(demoAmount);
-    const nextRank = RANKS.find(r => r.min > currentRank.min) || RANKS[RANKS.length - 1];
+// Сохранение имени донатера
+function saveDonorName() {
+    const input = document.getElementById('donorNameInput');
+    const name = input.value.trim();
+    
+    if (name && name.length > 0) {
+        const donorId = getOrCreateDonorId();
+        userDonationTotals[donorId].name = name;
+        localStorage.setItem('benzo_donor_name', name);
+        saveUserTotals();
+        
+        // Обновляем имя в текущих донатах
+        updateUserNameInDonations(name);
+        
+        input.value = '';
+        alert('Имя сохранено!');
+        updateUserRankProgress();
+    } else {
+        alert('Введите имя!');
+    }
+}
+
+// Обновление имени в существующих донатах
+function updateUserNameInDonations(newName) {
+    const donorId = getOrCreateDonorId();
+    realDonations.forEach(donation => {
+        if (donation.userId === donorId) {
+            donation.name = newName;
+        }
+    });
+    saveDonations();
+    updateDonationUI();
+}
+
+// Получение имени пользователя
+function getDonorName() {
+    const donorId = getOrCreateDonorId();
+    return userDonationTotals[donorId]?.name || "Анонимный донатер";
+}
+
+// Получить ранг по сумме (исправленная логика)
+function getRankByAmount(amount) {
+    // Если сумма меньше минимального для первого ранга
+    if (amount < RANKS[0].min) {
+        return { 
+            name: "БЕЗ РАНГА", 
+            min: 0, 
+            max: RANKS[0].min - 1, 
+            color: "#666", 
+            icon: "👤", 
+            level: 0
+        };
+    }
+    
+    // Проверяем ранги по порядку
+    for (let i = 0; i < RANKS.length; i++) {
+        const rank = RANKS[i];
+        if (amount >= rank.min && amount <= rank.max) {
+            return rank;
+        }
+    }
+    
+    // Если сумма больше максимального ранга (ЛЕГЕНДА)
+    return RANKS[RANKS.length - 1];
+}
+
+// Получить следующий ранг
+function getNextRank(currentRank) {
+    if (currentRank.level >= RANKS.length) {
+        return null; // Максимальный ранг
+    }
+    return RANKS.find(r => r.level === currentRank.level + 1);
+}
+
+// Сохранение данных пользователей
+function saveUserTotals() {
+    localStorage.setItem('benzo_user_totals', JSON.stringify(userDonationTotals));
+}
+
+// Загрузка данных пользователей
+function loadUserTotals() {
+    const saved = localStorage.getItem('benzo_user_totals');
+    if (saved) {
+        userDonationTotals = JSON.parse(saved);
+    }
+}
+
+// Обновление суммы пользователя при донате
+function updateUserTotal(userId, amount, userName) {
+    if (!userDonationTotals[userId]) {
+        userDonationTotals[userId] = {
+            name: userName,
+            total: 0,
+            count: 0,
+            rank: getRankByAmount(0)
+        };
+    }
+    
+    userDonationTotals[userId].total += amount;
+    userDonationTotals[userId].count += 1;
+    userDonationTotals[userId].name = userName;
+    
+    // Проверяем изменение ранга
+    const oldRank = userDonationTotals[userId].rank;
+    const newRank = getRankByAmount(userDonationTotals[userId].total);
+    userDonationTotals[userId].rank = newRank;
+    
+    saveUserTotals();
+    
+    // Если ранг изменился - показываем уведомление
+    if (oldRank.level !== newRank.level && newRank.level > 0) {
+        showRankUpgradeNotification(userDonationTotals[userId].name, oldRank, newRank);
+    }
+    
+    return newRank;
+}
+
+// Показать уведомление о повышении ранга
+function showRankUpgradeNotification(userName, oldRank, newRank) {
+    const notification = document.createElement('div');
+    
+    notification.innerHTML = `
+        <div style="
+            position: fixed;
+            top: 150px;
+            right: 20px;
+            background: rgba(0,0,0,0.95);
+            border: 3px solid ${newRank.color};
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 10001;
+            animation: slideInRight 0.5s, fadeOut 5s 4s forwards;
+            min-width: 300px;
+            backdrop-filter: blur(10px);
+            font-family: 'Share Tech Mono';
+            box-shadow: 0 0 20px ${newRank.color};
+        ">
+            <div style="text-align: center;">
+                <div style="font-size: 3em; margin-bottom: 10px;">
+                    ${newRank.icon}
+                </div>
+                <div style="color: ${newRank.color}; font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">
+                    НОВЫЙ РАНГ!
+                </div>
+                <div style="font-size: 1.5em; font-weight: bold; margin-bottom: 10px;">
+                    ${userName}
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <span style="color: ${oldRank.color}; text-decoration: line-through;">${oldRank.name}</span>
+                    <span style="margin: 0 10px;">→</span>
+                    <span style="color: ${newRank.color}; font-weight: bold;">${newRank.name}</span>
+                </div>
+                <div style="color: #ccc; font-size: 0.9em;">
+                    Уровень повышен до ${newRank.level}!
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 5000);
+}
+
+// Обновление прогресса пользователя
+function updateUserRankProgress() {
+    const donorId = getOrCreateDonorId();
+    const userData = userDonationTotals[donorId];
+    
+    if (!userData) {
+        // Создаем нового пользователя
+        userDonationTotals[donorId] = {
+            name: getDonorName(),
+            total: 0,
+            count: 0,
+            rank: getRankByAmount(0)
+        };
+        saveUserTotals();
+    }
+    
+    const totalAmount = userData.total || 0;
+    const currentRank = userData.rank || getRankByAmount(totalAmount);
+    const nextRank = getNextRank(currentRank);
     
     // Обновляем элементы
     const progressBar = document.getElementById('rankProgressBar');
@@ -2789,50 +3085,51 @@ function updateRankProgress() {
     const nextAmount = document.getElementById('nextRankAmount');
     
     if (progressBar && rankText && nextAmount) {
-        if (currentRank.level === 6) {
-            // Максимальный ранг
+        // Устанавливаем имя в поле ввода
+        const nameInput = document.getElementById('donorNameInput');
+        if (nameInput && userData.name !== "Анонимный донатер") {
+            nameInput.placeholder = `Текущее имя: ${userData.name}`;
+        }
+        
+        if (currentRank.level === 0) {
+            // Нет ранга (меньше 100 рублей)
+            const progress = Math.min(100, (totalAmount / RANKS[0].min) * 100);
+            progressBar.style.width = `${progress}%`;
+            progressBar.style.background = 'linear-gradient(90deg, var(--primary-color), #00ff00)';
+            rankText.innerHTML = `<span style="color: ${currentRank.color}">${currentRank.icon} ${currentRank.name} (${totalAmount}₽/${RANKS[0].min}₽)</span>`;
+            nextAmount.textContent = `${RANKS[0].min - totalAmount}₽`;
+        } 
+        else if (!nextRank) {
+            // Максимальный ранг (ЛЕГЕНДА)
             progressBar.style.width = '100%';
             progressBar.style.background = 'linear-gradient(90deg, #ffd700, #ff0000)';
-            rankText.innerHTML = `<span style="color: #ffd700">👑 ЛЕГЕНДА (макс. уровень)</span>`;
+            rankText.innerHTML = `<span style="color: ${currentRank.color}">${currentRank.icon} ${currentRank.name} (макс. уровень)</span>`;
             nextAmount.textContent = "Достигнут максимум!";
-        } else {
-            // Прогресс до следующего ранга
-            const progress = Math.min(100, ((demoAmount - currentRank.min) / (nextRank.min - currentRank.min)) * 100);
+        } 
+        else {
+            // Обычный ранг (не максимальный)
+            const progress = Math.min(100, ((totalAmount - currentRank.min) / (nextRank.min - currentRank.min)) * 100);
             progressBar.style.width = `${progress}%`;
-            rankText.innerHTML = `${currentRank.icon} ${currentRank.name} (${demoAmount}₽/${nextRank.min}₽)`;
-            nextAmount.textContent = `${nextRank.min - demoAmount}₽`;
-            rankText.style.color = currentRank.color;
+            progressBar.style.background = `linear-gradient(90deg, ${currentRank.color}, ${nextRank.color})`;
+            rankText.innerHTML = `<span style="color: ${currentRank.color}">${currentRank.icon} ${currentRank.name} (${totalAmount}₽/${nextRank.min}₽)</span>`;
+            nextAmount.textContent = `${nextRank.min - totalAmount}₽`;
         }
     }
 }
 
-// Инициализация при загрузке
+// ================== ИНИЦИАЛИЗАЦИЯ СИСТЕМЫ РАНГОВ ==================
 document.addEventListener('DOMContentLoaded', function() {
-    updateRankProgress();
+    loadUserTotals();
+    updateUserRankProgress();
     
-    // Обновляем каждые 30 сек для демо (в реальном проекте - при донате)
-    setInterval(updateRankProgress, 30000);
-    
-    // Анимация при наведении
-    document.querySelectorAll('.rank-card').forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.boxShadow = 'var(--glow)';
-        });
-        card.addEventListener('mouseleave', function() {
-            this.style.boxShadow = 'none';
-        });
-    });
+    // Обновляем каждые 10 секунд (на случай, если сумма изменилась в другой вкладке)
+    setInterval(updateUserRankProgress, 10000);
 });
 
-// Функция для проверки ранга (вызови в консоли)
-window.checkRank = function(amount) {
-    const rank = getRankByAmount(amount || 0);
-    console.log(`💰 При ${amount}₽ ваш ранг:`);
-    console.log(`${rank.icon} ${rank.name} (Уровень ${rank.level})`);
-    console.log(`Цвет: ${rank.color}`);
-    console.log(`Следующий ранг: ${RANKS.find(r => r.min > rank.min)?.name || 'МАКСИМАЛЬНЫЙ'}`);
-    return rank;
-};
+// Экспорт функций для использования в других частях кода
+window.updateUserTotal = updateUserTotal;
+window.getOrCreateDonorId = getOrCreateDonorId;
+window.getDonorName = getDonorName;
 </script>
 
     </section>
