@@ -2357,7 +2357,7 @@ document.addEventListener('DOMContentLoaded', loadProgress);
             border-top: 1px solid rgba(255,255,255,0.1);
         ">
             <i class="fas fa-chart-line" style="margin-right: 8px; color: var(--accent-color);"></i>
-            ОБЩАЯ СУММА: <span id="totalDonated" style="color: #00ff00; font-weight: bold; font-size: 1.1rem;">0 ₽</span>
+            ОБЩАЯ СУММА: <span id="totalDonated" style="color: #00ff00; font-weight: bold; font-size: 1.1rem;">100 ₽</span>
         </div>
     </div>
 
@@ -2481,34 +2481,11 @@ document.addEventListener('DOMContentLoaded', loadProgress);
 // ================== СИСТЕМА ДОНАТОВ ==================
 let realDonations = [
     {
-        name: "MAXIM",
-        amount: 5000,
-        message: "Жду новый альбом!",
-        timestamp: Date.now() - 86400000
-    },
-    {
-        name: "АЛЕКСАНДР",
-        amount: 2500,
-        message: "Топ музыка",
-        timestamp: Date.now() - 43200000
-    },
-    {
-        name: "KATYA",
-        amount: 1000,
+        name: "Unknown",
+        amount: 100,
         message: "",
-        timestamp: Date.now() - 7200000
-    },
-    {
-        name: "ДМИТРИЙ",
-        amount: 300,
-        message: "Поддерживаю!",
-        timestamp: Date.now() - 3600000
-    },
-    {
-        name: "АННА",
-        amount: 1500,
-        message: "Обожаю треки",
-        timestamp: Date.now() - 1800000
+        timestamp: Date.now(),
+        id: Date.now() + Math.random()
     }
 ];
 
@@ -2966,17 +2943,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updateDonationUI, 20000);
 });
 
-// Экспортируем функцию для тестирования
+// Экспортируем только основную функцию
 window.addRealDonation = addRealDonation;
-window.testDonation = function() {
-    const names = ['MAXIM', 'АЛЕКСЕЙ', 'ДМИТРИЙ', 'АННА', 'СЕРГЕЙ', 'ЕКАТЕРИНА', 'МИХАИЛ', 'ОЛЬГА'];
-    const messages = ['За новый альбом!', 'Топ музыка', 'Жду концерт', 'Люблю треки', 'Удачи в творчестве', 'Супер звук', 'Вдохновляешь!', 'Продолжай в том же духе'];
-    const name = names[Math.floor(Math.random() * names.length)];
-    const amount = [300, 500, 1000, 1500, 2500, 5000][Math.floor(Math.random() * 6)];
-    const message = Math.random() > 0.3 ? messages[Math.floor(Math.random() * messages.length)] : '';
-    
-    addRealDonation(name, amount, message);
-};
 </script>
 <!-- ================== ОБНОВЛЕННАЯ СИСТЕМА РАНГОВ ================== -->
 <div style="
