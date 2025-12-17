@@ -5260,5 +5260,961 @@ window.getDonorName = getDonorName;
             console.log("✅ Приложение инициализировано");
         });
     </script>
+    <!-- ================== ГЛОБАЛЬНАЯ ПАНЕЛЬ ПРОФИЛЯ ================== -->
+<div id="globalProfilePanel" style="
+    display: none; /* Показывается только если пользователь вошел */
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.9);
+    border: 2px solid var(--primary-color);
+    border-radius: 12px;
+    padding: 1rem;
+    backdrop-filter: blur(15px);
+    box-shadow: var(--glow);
+    z-index: 9999;
+    min-width: 280px;
+    font-family: 'Share Tech Mono', monospace;
+">
+    <!-- Заголовок профиля -->
+    <div style="
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid var(--primary-color);
+    ">
+        <div style="
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: var(--icon-glow);
+        " id="profileAvatar">
+            👤
+        </div>
+        <div style="flex: 1;">
+            <div style="color: white; font-weight: bold; font-size: 1.1rem;" id="profileName">
+                Гость
+            </div>
+            <div style="color: var(--primary-color); font-size: 0.8rem;" id="profileStatus">
+                Не авторизован
+            </div>
+        </div>
+        <button onclick="toggleProfileMenu()" style="
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.3rem;
+        ">
+            <i class="fas fa-chevron-down" id="profileMenuIcon"></i>
+        </button>
+    </div>
+    
+    <!-- Расширенное меню (скрыто по умолчанию) -->
+    <div id="profileExtendedMenu" style="display: none;">
+        <!-- Быстрая статистика -->
+        <div style="
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+        ">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <div style="text-align: center;">
+                    <div style="color: #aaa; font-size: 0.7rem;">ДОНАТЫ</div>
+                    <div style="color: #00ff00; font-weight: bold; font-size: 1.1rem;" id="profileDonationTotal">
+                        0₽
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="color: #aaa; font-size: 0.7rem;">ЛАЙКИ</div>
+                    <div style="color: #ff4757; font-weight: bold; font-size: 1.1rem;" id="profileLikesTotal">
+                        0
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Навигация по профилю -->
+        <div style="margin-bottom: 0.8rem;">
+            <button onclick="showSection('music')" style="
+                width: 100%;
+                background: rgba(255,255,255,0.08);
+                border: 1px solid var(--primary-color);
+                color: var(--text-color);
+                padding: 0.6rem;
+                border-radius: 6px;
+                cursor: pointer;
+                font-family: 'Share Tech Mono';
+                margin-bottom: 0.4rem;
+                text-align: left;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            ">
+                <i class="fas fa-music"></i> Мои треки
+            </button>
+            <button onclick="showSection('support')" style="
+                width: 100%;
+                background: rgba(255,255,255,0.08);
+                border: 1px solid var(--primary-color);
+                color: var(--text-color);
+                padding: 0.6rem;
+                border-radius: 6px;
+                cursor: pointer;
+                font-family: 'Share Tech Mono';
+                text-align: left;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            ">
+                <i class="fas fa-heart"></i> Мои донаты
+            </button>
+        </div>
+        
+        <!-- Действия -->
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.8rem;">
+            <button onclick="openProfileSettings()" style="
+                width: 100%;
+                background: rgba(255,255,255,0.05);
+                border: 1px solid var(--primary-color);
+                color: var(--text-color);
+                padding: 0.6rem;
+                border-radius: 6px;
+                cursor: pointer;
+                font-family: 'Share Tech Mono';
+                margin-bottom: 0.4rem;
+                text-align: left;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            ">
+                <i class="fas fa-cog"></i> Настройки
+            </button>
+            <button onclick="logoutUser()" style="
+                width: 100%;
+                background: rgba(255,0,0,0.1);
+                border: 1px solid #ff4757;
+                color: #ff4757;
+                padding: 0.6rem;
+                border-radius: 6px;
+                cursor: pointer;
+                font-family: 'Share Tech Mono';
+                text-align: left;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            ">
+                <i class="fas fa-sign-out-alt"></i> Выйти
+            </button>
+        </div>
+    </div>
+    
+    <!-- Кнопка быстрого доната -->
+    <button onclick="quickDonate()" style="
+        width: 100%;
+        background: var(--primary-color);
+        color: black;
+        border: 2px solid var(--primary-color);
+        padding: 0.7rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bold;
+        margin-top: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: var(--icon-glow);
+    ">
+        <i class="fas fa-bolt" style="margin-right: 8px;"></i> ПОДДЕРЖАТЬ
+    </button>
+</div>
+
+<!-- ================== МОДАЛЬНОЕ ОКНО ПРОФИЛЯ ================== -->
+<div id="profileModal" style="
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+">
+    <div style="
+        background: rgba(0,0,0,0.95);
+        border: 3px solid var(--primary-color);
+        border-radius: 15px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        backdrop-filter: blur(20px);
+        box-shadow: var(--glow), 0 0 30px var(--primary-color);
+    ">
+        <div style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-color);
+        ">
+            <h2 style="
+                color: var(--primary-color);
+                margin: 0;
+                font-family: 'Montserrat', sans-serif;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            ">
+                <i class="fas fa-user-circle" style="margin-right: 10px;"></i>
+                ВАШ ПРОФИЛЬ
+            </h2>
+            <button onclick="closeProfileModal()" style="
+                background: none;
+                border: none;
+                color: var(--primary-color);
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0.5rem;
+            ">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- Содержимое модального окна -->
+        <div id="profileModalContent">
+            <!-- Загружается динамически -->
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+#globalProfilePanel {
+    animation: slideDown 0.3s ease-out;
+}
+
+.profile-notification {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: rgba(0,0,0,0.95);
+    border: 2px solid var(--primary-color);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    z-index: 10001;
+    animation: slideDown 0.5s ease-out, fadeOut 3s 2s forwards;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 0 20px var(--primary-color);
+    max-width: 300px;
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; transform: translateY(-20px); }
+}
+</style>
+
+<script>
+// ================== ГЛОБАЛЬНАЯ СИСТЕМА ПРОФИЛЯ ==================
+
+// Глобальный профиль пользователя
+let globalUserProfile = {
+    id: null,
+    name: 'Гость',
+    email: '',
+    avatar: '👤',
+    isLoggedIn: false,
+    isGuest: true,
+    stats: {
+        donations: 0,
+        likes: 0,
+        plays: 0,
+        favorites: 0
+    },
+    preferences: {
+        theme: 'cyber-black',
+        notifications: true,
+        autoPlay: true,
+        volume: 70
+    },
+    activity: {
+        lastLogin: null,
+        totalTime: 0,
+        lastDonation: null
+    }
+};
+
+// ================== ФУНКЦИИ ПРОФИЛЯ ==================
+
+// Инициализация профиля
+function initGlobalProfile() {
+    const saved = localStorage.getItem('benzo_global_profile');
+    
+    if (saved) {
+        try {
+            globalUserProfile = JSON.parse(saved);
+            
+            // Проверяем, есть ли донаты у пользователя
+            const donations = JSON.parse(localStorage.getItem('benzo_real_donations') || '[]');
+            const userDonations = donations.filter(d => d.name === globalUserProfile.name);
+            
+            if (userDonations.length > 0) {
+                globalUserProfile.stats.donations = userDonations.reduce((sum, d) => sum + d.amount, 0);
+            }
+            
+        } catch (e) {
+            console.error('Ошибка загрузки профиля:', e);
+        }
+    }
+    
+    updateProfilePanel();
+    
+    // Показываем панель только если пользователь не гость
+    if (!globalUserProfile.isGuest) {
+        document.getElementById('globalProfilePanel').style.display = 'block';
+    }
+}
+
+// Сохранить профиль
+function saveGlobalProfile() {
+    localStorage.setItem('benzo_global_profile', JSON.stringify(globalUserProfile));
+}
+
+// Обновить панель профиля
+function updateProfilePanel() {
+    document.getElementById('profileName').textContent = globalUserProfile.name;
+    document.getElementById('profileAvatar').textContent = globalUserProfile.avatar;
+    document.getElementById('profileDonationTotal').textContent = globalUserProfile.stats.donations + '₽';
+    document.getElementById('profileLikesTotal').textContent = globalUserProfile.stats.likes;
+    
+    if (globalUserProfile.isGuest) {
+        document.getElementById('profileStatus').textContent = 'Не авторизован';
+        document.getElementById('profileStatus').style.color = '#888';
+    } else {
+        document.getElementById('profileStatus').textContent = 'Онлайн';
+        document.getElementById('profileStatus').style.color = '#00ff00';
+    }
+}
+
+// Переключить меню профиля
+function toggleProfileMenu() {
+    const menu = document.getElementById('profileExtendedMenu');
+    const icon = document.getElementById('profileMenuIcon');
+    
+    if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+        icon.className = 'fas fa-chevron-down';
+    } else {
+        menu.style.display = 'block';
+        icon.className = 'fas fa-chevron-up';
+    }
+}
+
+// Быстрый донат
+function quickDonate() {
+    if (globalUserProfile.isGuest) {
+        showLoginPrompt();
+        return;
+    }
+    
+    const amount = prompt('Введите сумму доната (₽):', '100');
+    if (amount && !isNaN(amount) && amount > 0) {
+        const message = prompt('Сообщение (необязательно):', '');
+        
+        if (window.addRealDonation) {
+            window.addRealDonation(globalUserProfile.name, parseInt(amount), message);
+            
+            // Обновляем статистику
+            globalUserProfile.stats.donations += parseInt(amount);
+            globalUserProfile.activity.lastDonation = Date.now();
+            saveGlobalProfile();
+            updateProfilePanel();
+            
+            showNotification('Донат успешно отправлен!', 'success');
+        }
+    }
+}
+
+// Войти/Зарегистрироваться
+function showLoginPrompt() {
+    const action = confirm('Хотите войти под своим именем?\n\n"ОК" - Войти/Зарегистрироваться\n"Отмена" - Остаться гостем');
+    
+    if (action) {
+        openProfileModal('login');
+    }
+}
+
+// Открыть модальное окно профиля
+function openProfileModal(section = 'main') {
+    const modal = document.getElementById('profileModal');
+    const content = document.getElementById('profileModalContent');
+    
+    let html = '';
+    
+    switch(section) {
+        case 'login':
+            html = `
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">👤</div>
+                    <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">ВХОД / РЕГИСТРАЦИЯ</h3>
+                    <div style="color: #aaa; margin-bottom: 1.5rem;">
+                        Создайте профиль для отслеживания статистики
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <input type="text" 
+                           id="loginName" 
+                           placeholder="Ваше имя" 
+                           style="
+                               width: 100%;
+                               padding: 0.8rem;
+                               background: rgba(255,255,255,0.1);
+                               border: 2px solid var(--primary-color);
+                               border-radius: 8px;
+                               color: white;
+                               font-family: 'Share Tech Mono';
+                               margin-bottom: 1rem;
+                           ">
+                    
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                        <button onclick="selectAvatar('👤')" style="flex: 1; padding: 0.5rem; background: rgba(255,255,255,0.1); border: 1px solid var(--primary-color); border-radius: 6px; color: white; cursor: pointer; font-size: 1.5rem;">👤</button>
+                        <button onclick="selectAvatar('🎵')" style="flex: 1; padding: 0.5rem; background: rgba(255,255,255,0.1); border: 1px solid var(--primary-color); border-radius: 6px; color: white; cursor: pointer; font-size: 1.5rem;">🎵</button>
+                        <button onclick="selectAvatar('🔥')" style="flex: 1; padding: 0.5rem; background: rgba(255,255,255,0.1); border: 1px solid var(--primary-color); border-radius: 6px; color: white; cursor: pointer; font-size: 1.5rem;">🔥</button>
+                        <button onclick="selectAvatar('✨')" style="flex: 1; padding: 0.5rem; background: rgba(255,255,255,0.1); border: 1px solid var(--primary-color); border-radius: 6px; color: white; cursor: pointer; font-size: 1.5rem;">✨</button>
+                    </div>
+                    
+                    <div style="text-align: center; margin-bottom: 1rem; font-size: 1.5rem;" id="selectedAvatar">
+                        👤
+                    </div>
+                </div>
+                
+                <button onclick="registerUser()" style="
+                    width: 100%;
+                    background: var(--primary-color);
+                    color: black;
+                    border: 2px solid var(--primary-color);
+                    padding: 1rem;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-family: 'Montserrat', sans-serif;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    margin-bottom: 1rem;
+                ">
+                    <i class="fas fa-user-plus" style="margin-right: 8px;"></i> СОЗДАТЬ ПРОФИЛЬ
+                </button>
+                
+                <div style="text-align: center; color: #aaa; font-size: 0.8rem;">
+                    Или <a href="#" onclick="openProfileModal('main')" style="color: var(--primary-color); cursor: pointer;">вернуться назад</a>
+                </div>
+            `;
+            break;
+            
+        case 'settings':
+            html = `
+                <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">
+                    <i class="fas fa-cog" style="margin-right: 10px;"></i>
+                    НАСТРОЙКИ ПРОФИЛЯ
+                </h3>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="color: white; margin-bottom: 0.5rem; font-weight: bold;">Имя профиля</div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" 
+                               id="settingsName" 
+                               value="${globalUserProfile.name}"
+                               style="
+                                   flex: 1;
+                                   padding: 0.8rem;
+                                   background: rgba(255,255,255,0.1);
+                                   border: 2px solid var(--primary-color);
+                                   border-radius: 8px;
+                                   color: white;
+                                   font-family: 'Share Tech Mono';
+                               ">
+                        <button onclick="updateProfileName()" style="
+                            padding: 0.8rem 1.5rem;
+                            background: var(--primary-color);
+                            color: black;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            white-space: nowrap;
+                        ">
+                            ОК
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="color: white; margin-bottom: 0.5rem; font-weight: bold;">Аватар</div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+                        ${['👤', '🎵', '🔥', '✨', '🎧', '⚡', '🎯', '🚀', '💎', '👑', '⭐', '🎁'].map(avatar => `
+                            <button onclick="updateProfileAvatar('${avatar}')" 
+                                    style="
+                                        padding: 1rem;
+                                        background: ${globalUserProfile.avatar === avatar ? 'var(--primary-color)' : 'rgba(255,255,255,0.1)'};
+                                        border: 2px solid ${globalUserProfile.avatar === avatar ? 'var(--primary-color)' : 'var(--primary-color)'};
+                                        border-radius: 8px;
+                                        cursor: pointer;
+                                        font-size: 1.5rem;
+                                        color: ${globalUserProfile.avatar === avatar ? 'black' : 'white'};
+                                    ">
+                                ${avatar}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                    <button onclick="exportProfileData()" style="
+                        width: 100%;
+                        background: rgba(255,255,255,0.1);
+                        border: 2px solid var(--primary-color);
+                        color: var(--text-color);
+                        padding: 0.8rem;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        margin-bottom: 0.8rem;
+                        text-align: left;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.8rem;
+                    ">
+                        <i class="fas fa-download"></i> Экспорт данных
+                    </button>
+                    
+                    <button onclick="resetProfile()" style="
+                        width: 100%;
+                        background: rgba(255,0,0,0.1);
+                        border: 2px solid #ff4757;
+                        color: #ff4757;
+                        padding: 0.8rem;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        text-align: left;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.8rem;
+                    ">
+                        <i class="fas fa-trash"></i> Сбросить профиль
+                    </button>
+                </div>
+            `;
+            break;
+            
+        default: // main
+            html = `
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">${globalUserProfile.avatar}</div>
+                    <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">${globalUserProfile.name}</h3>
+                    <div style="color: #aaa; margin-bottom: 1.5rem;">
+                        ${globalUserProfile.isGuest ? 'Гостевой профиль' : 'Участник с ' + new Date(globalUserProfile.activity.lastLogin).toLocaleDateString('ru-RU')}
+                    </div>
+                </div>
+                
+                <div style="
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 1rem;
+                    margin-bottom: 1.5rem;
+                    padding: 1rem;
+                    background: rgba(255,255,255,0.05);
+                    border-radius: 10px;
+                    border: 1px solid rgba(255,255,255,0.1);
+                ">
+                    <div style="text-align: center;">
+                        <div style="color: #aaa; font-size: 0.8rem; margin-bottom: 0.3rem;">
+                            <i class="fas fa-coins"></i> ДОНАТЫ
+                        </div>
+                        <div style="color: #00ff00; font-weight: bold; font-size: 1.5rem;">
+                            ${globalUserProfile.stats.donations}₽
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="color: #aaa; font-size: 0.8rem; margin-bottom: 0.3rem;">
+                            <i class="fas fa-heart"></i> ЛАЙКИ
+                        </div>
+                        <div style="color: #ff4757; font-weight: bold; font-size: 1.5rem;">
+                            ${globalUserProfile.stats.likes}
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="color: #aaa; font-size: 0.8rem; margin-bottom: 0.3rem;">
+                            <i class="fas fa-play"></i> ПРОСЛУШИВАНИЙ
+                        </div>
+                        <div style="color: #00ccff; font-weight: bold; font-size: 1.5rem;">
+                            ${globalUserProfile.stats.plays}
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="color: #aaa; font-size: 0.8rem; margin-bottom: 0.3rem;">
+                            <i class="fas fa-star"></i> ИЗБРАННОЕ
+                        </div>
+                        <div style="color: #ffd700; font-weight: bold; font-size: 1.5rem;">
+                            ${globalUserProfile.stats.favorites}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+                    <button onclick="openProfileModal('settings')" style="
+                        flex: 1;
+                        background: rgba(255,255,255,0.1);
+                        border: 2px solid var(--primary-color);
+                        color: var(--text-color);
+                        padding: 0.8rem;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-family: 'Share Tech Mono';
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.5rem;
+                    ">
+                        <i class="fas fa-cog"></i> НАСТРОЙКИ
+                    </button>
+                    
+                    ${globalUserProfile.isGuest ? `
+                    <button onclick="openProfileModal('login')" style="
+                        flex: 1;
+                        background: var(--primary-color);
+                        color: black;
+                        border: 2px solid var(--primary-color);
+                        padding: 0.8rem;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-family: 'Share Tech Mono';
+                        font-weight: bold;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.5rem;
+                    ">
+                        <i class="fas fa-sign-in-alt"></i> ВОЙТИ
+                    </button>
+                    ` : ''}
+                </div>
+                
+                ${!globalUserProfile.isGuest ? `
+                <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                    <button onclick="logoutUser()" style="
+                        width: 100%;
+                        background: rgba(255,0,0,0.1);
+                        border: 2px solid #ff4757;
+                        color: #ff4757;
+                        padding: 0.8rem;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-family: 'Share Tech Mono';
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.8rem;
+                    ">
+                        <i class="fas fa-sign-out-alt"></i> ВЫЙТИ ИЗ ПРОФИЛЯ
+                    </button>
+                </div>
+                ` : ''}
+            `;
+    }
+    
+    content.innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+// Закрыть модальное окно
+function closeProfileModal() {
+    document.getElementById('profileModal').style.display = 'none';
+}
+
+// Выбрать аватар
+function selectAvatar(avatar) {
+    document.getElementById('selectedAvatar').textContent = avatar;
+}
+
+// Зарегистрировать пользователя
+function registerUser() {
+    const nameInput = document.getElementById('loginName');
+    const name = nameInput.value.trim();
+    const avatar = document.getElementById('selectedAvatar').textContent;
+    
+    if (!name || name.length < 2) {
+        showNotification('Введите имя (минимум 2 символа)', 'error');
+        return;
+    }
+    
+    if (name.length > 20) {
+        showNotification('Имя слишком длинное (макс. 20 символов)', 'error');
+        return;
+    }
+    
+    // Создаем профиль
+    globalUserProfile = {
+        id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        name: name,
+        email: '',
+        avatar: avatar,
+        isLoggedIn: true,
+        isGuest: false,
+        stats: {
+            donations: 0,
+            likes: 0,
+            plays: 0,
+            favorites: 0
+        },
+        preferences: {
+            theme: localStorage.getItem('benzo_theme') || 'cyber-black',
+            notifications: true,
+            autoPlay: true,
+            volume: 70
+        },
+        activity: {
+            lastLogin: Date.now(),
+            totalTime: 0,
+            lastDonation: null
+        }
+    };
+    
+    saveGlobalProfile();
+    
+    // Обновляем старые донаты на новое имя
+    updateOldDonations(name);
+    
+    // Показываем панель профиля
+    document.getElementById('globalProfilePanel').style.display = 'block';
+    updateProfilePanel();
+    closeProfileModal();
+    
+    showNotification(`Добро пожаловать, ${name}!`, 'success');
+    
+    // Применяем тему пользователя
+    if (window.changeTheme) {
+        window.changeTheme(globalUserProfile.preferences.theme);
+    }
+}
+
+// Обновить старые донаты на новое имя
+function updateOldDonations(newName) {
+    if (window.realDonations && window.saveDonations && window.updateDonationUI) {
+        let updated = false;
+        window.realDonations.forEach(donation => {
+            if (donation.name === 'Unknown' || donation.name === 'АНОНИМ' || donation.name === 'Гость') {
+                donation.name = newName;
+                updated = true;
+            }
+        });
+        
+        if (updated) {
+            window.saveDonations();
+            window.updateDonationUI();
+        }
+    }
+}
+
+// Обновить имя профиля
+function updateProfileName() {
+    const newName = document.getElementById('settingsName').value.trim();
+    
+    if (!newName || newName.length < 2) {
+        showNotification('Введите имя (минимум 2 символа)', 'error');
+        return;
+    }
+    
+    globalUserProfile.name = newName;
+    saveGlobalProfile();
+    updateProfilePanel();
+    updateOldDonations(newName);
+    
+    showNotification('Имя обновлено!', 'success');
+}
+
+// Обновить аватар профиля
+function updateProfileAvatar(avatar) {
+    globalUserProfile.avatar = avatar;
+    saveGlobalProfile();
+    updateProfilePanel();
+    openProfileModal('settings'); // Перезагружаем окно настроек
+    
+    showNotification('Аватар обновлен!', 'success');
+}
+
+// Выйти из профиля
+function logoutUser() {
+    if (confirm('Выйти из профиля?')) {
+        globalUserProfile.isLoggedIn = false;
+        globalUserProfile.isGuest = true;
+        saveGlobalProfile();
+        
+        document.getElementById('globalProfilePanel').style.display = 'none';
+        closeProfileModal();
+        
+        showNotification('Вы вышли из профиля', 'info');
+    }
+}
+
+// Сбросить профиль
+function resetProfile() {
+    if (confirm('Точно сбросить профиль? Все ваши данные будут удалены!')) {
+        localStorage.removeItem('benzo_global_profile');
+        globalUserProfile = {
+            id: null,
+            name: 'Гость',
+            email: '',
+            avatar: '👤',
+            isLoggedIn: false,
+            isGuest: true,
+            stats: { donations: 0, likes: 0, plays: 0, favorites: 0 },
+            preferences: { theme: 'cyber-black', notifications: true, autoPlay: true, volume: 70 },
+            activity: { lastLogin: null, totalTime: 0, lastDonation: null }
+        };
+        
+        document.getElementById('globalProfilePanel').style.display = 'none';
+        closeProfileModal();
+        
+        showNotification('Профиль сброшен', 'info');
+    }
+}
+
+// Экспорт данных профиля
+function exportProfileData() {
+    const dataStr = JSON.stringify(globalUserProfile, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `benzo_profile_${Date.now()}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    showNotification('Данные экспортированы!', 'success');
+}
+
+// Показать уведомление
+function showNotification(message, type = 'info') {
+    const colors = {
+        success: '#00ff00',
+        error: '#ff4757',
+        info: 'var(--primary-color)',
+        warning: '#ff9900'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = 'profile-notification';
+    notification.innerHTML = `
+        <div style="
+            color: ${colors[type]}; 
+            font-weight: bold; 
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        ">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            ${type.toUpperCase()}
+        </div>
+        <div style="font-size: 0.9em;">${message}</div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 3000);
+}
+
+// ================== ИНТЕГРАЦИЯ С СУЩЕСТВУЮЩИМ КОДОМ ==================
+
+// Обновить статистику при лайке
+function updateProfileOnLike() {
+    if (!globalUserProfile.isGuest) {
+        globalUserProfile.stats.likes += 1;
+        saveGlobalProfile();
+        updateProfilePanel();
+    }
+}
+
+// Обновить статистику при прослушивании
+function updateProfileOnPlay() {
+    if (!globalUserProfile.isGuest) {
+        globalUserProfile.stats.plays += 1;
+        saveGlobalProfile();
+        updateProfilePanel();
+    }
+}
+
+// Обновить статистику при добавлении в избранное
+function updateProfileOnFavorite() {
+    if (!globalUserProfile.isGuest) {
+        globalUserProfile.stats.favorites += 1;
+        saveGlobalProfile();
+        updateProfilePanel();
+    }
+}
+
+// ================== ИНИЦИАЛИЗАЦИЯ ==================
+document.addEventListener('DOMContentLoaded', function() {
+    initGlobalProfile();
+    
+    // Добавляем кнопку открытия профиля в навигацию
+    const nav = document.querySelector('nav');
+    if (nav) {
+        const profileBtn = document.createElement('button');
+        profileBtn.className = 'nav-btn';
+        profileBtn.innerHTML = '<i class="fas fa-user-circle" style="margin-right: 8px;"></i> ПРОФИЛЬ';
+        profileBtn.onclick = () => openProfileModal();
+        nav.appendChild(profileBtn);
+    }
+    
+    // Отслеживаем активность пользователя
+    setInterval(() => {
+        if (!globalUserProfile.isGuest) {
+            globalUserProfile.activity.totalTime += 1;
+            if (globalUserProfile.activity.totalTime % 60 === 0) { // Каждую минуту
+                saveGlobalProfile();
+            }
+        }
+    }, 1000);
+});
+
+// Экспортируем функции для интеграции
+window.openProfileModal = openProfileModal;
+window.updateProfileOnLike = updateProfileOnLike;
+window.updateProfileOnPlay = updateProfileOnPlay;
+window.updateProfileOnFavorite = updateProfileOnFavorite;
+</script>
 </body>
 </html>
