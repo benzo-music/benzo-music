@@ -5638,23 +5638,29 @@ function toggleProfileMenu() {
 let lastDonationTime = 0;
 const DONATION_COOLDOWN = 5000; // 5 секунд между донатами
 
-// Быстрый донат - ЗАЩИЩЕННАЯ ВЕРСИЯ
+// Быстрый донат - РЕАЛЬНЫЙ (ЮMoney)
 function quickDonate() {
-    // Проверка кулдауна
-    const now = Date.now();
-    if (now - lastDonationTime < DONATION_COOLDOWN) {
-        const remaining = Math.ceil((DONATION_COOLDOWN - (now - lastDonationTime)) / 1000);
-        showNotification(`Подождите ${remaining} сек. перед следующим донатом`, 'warning');
-        return;
-    }
-    
     if (globalUserProfile.isGuest) {
         showLoginPrompt();
         return;
     }
     
+    // Открываем реальную страницу оплаты ЮMoney
     const amount = prompt('Введите сумму доната (₽):', '100');
-    if (amount && !isNaN(amount) && amount > 0) {
+    if (amount && !isNaN(amount) && amount >= 10) {
+        const message = prompt('Сообщение (необязательно):', '');
+        
+        // Формируем URL для ЮMoney
+        const yoomoneyUrl = `https://yoomoney.ru/quickpay/confirm?receiver=4100118454141760&quickpay-form=donate&sum=${amount}&label=${encodeURIComponent(globalUserProfile.name)}&targets=${encodeURIComponent(message || `Донат от ${globalUserProfile.name}`)}`;
+        
+        // Открываем в новом окне
+        window.open(yoomoneyUrl, '_blank');
+        
+        showNotification('Открыта страница оплаты. После оплаты обновите страницу.', 'info');
+    } else if (amount) {
+        showNotification('Некорректная сумма (мин. 10₽)', 'error');
+    }
+}
         
         // Проверка минимальной и максимальной суммы
         const amountNum = parseInt(amount);
