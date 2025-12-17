@@ -5634,8 +5634,20 @@ function toggleProfileMenu() {
     }
 }
 
-// Быстрый донат
+// ================== ЗАЩИТА ОТ НАКРУТКИ ==================
+let lastDonationTime = 0;
+const DONATION_COOLDOWN = 5000; // 5 секунд между донатами
+
+// Быстрый донат - ЗАЩИЩЕННАЯ ВЕРСИЯ
 function quickDonate() {
+    // Проверка кулдауна
+    const now = Date.now();
+    if (now - lastDonationTime < DONATION_COOLDOWN) {
+        const remaining = Math.ceil((DONATION_COOLDOWN - (now - lastDonationTime)) / 1000);
+        showNotification(`Подождите ${remaining} сек. перед следующим донатом`, 'warning');
+        return;
+    }
+    
     if (globalUserProfile.isGuest) {
         showLoginPrompt();
         return;
@@ -5643,20 +5655,252 @@ function quickDonate() {
     
     const amount = prompt('Введите сумму доната (₽):', '100');
     if (amount && !isNaN(amount) && amount > 0) {
-        const message = prompt('Сообщение (необязательно):', '');
         
-        if (window.addRealDonation) {
-            window.addRealDonation(globalUserProfile.name, parseInt(amount), message);
-            
-            // Обновляем статистику
-            globalUserProfile.stats.donations += parseInt(amount);
-            globalUserProfile.activity.lastDonation = Date.now();
-            saveGlobalProfile();
-            updateProfilePanel();
-            
-            showNotification('Донат успешно отправлен!', 'success');
+        // Проверка минимальной и максимальной суммы
+        const amountNum = parseInt(amount);
+        if (amountNum < 10) {
+            showNotification('Минимальная сумма 10₽', 'error');
+            return;
+        }
+        if (amountNum > 100000) {
+            showNotification('Максимальная сумма 100,000₽', 'error');
+            return;
+        }
+        
+        const message = prompt('Сообщение (необязательно, макс. 100 символов):', '');
+        
+        if (message && message.length > 100) {
+            showNotification('Сообщение слишком длинное (макс. 100 символов)', 'error');
+            return;
+        }
+        
+        const confirmed = confirm(`Подтвердите донат:\n\nСумма: ${amount}₽\nОт: ${globalUserProfile.name}\n${message ? `Сообщение: "${message}"` : ''}\n\nОК - подтвердить\nОтмена - отменить`);
+        
+        if (!confirmed) {
+            showNotification('Донат отменен', 'info');
+            return;
+        }
+        
+        // Фиксируем время доната
+        lastDonationTime = Date.now();
+        
+        // Показываем обработку
+        showProcessingDonation(amountNum, message);
+        
+    } else if (amount) {
+        showNotification('Некорректная сумма', 'error');
+    }
+}
+
+// Показать процесс обработки
+function showProcessingDonation(amount, message) {
+    const processing = document.createElement('div');
+    processing.id = 'donationProcessing';
+    processing.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.95);
+        border: 3px solid var(--primary-color);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        z-index: 10001;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 0 40px var(--primary-color);
+        max-width: 400px;
+        text-align: center;
+        font-family: 'Share Tech Mono', monospace;
+    `;
+    
+    processing.innerHTML = `
+        <div style="font-size: 2rem; margin-bottom: 1rem;">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <div style="color: var(--primary-color); font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem;">
+            ОБРАБОТКА ПЛАТЕЖА...
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+            <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;">
+                ${amount}₽
+            </div>
+            <div style="color: #ccc; font-size: 0.9rem;">
+                Пожалуйста, подождите
+            </div>
+        </div>
+        <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;">
+            <div id="donationProgressBar" style="width: 0%; height: 100%; background: var(--primary-color); transition: width 1.5s ease;"></div>
+        </div>
+    `;
+    
+    document.body.appendChild(processing);
+    
+    // Анимация прогресса
+    setTimeout(() => {
+        const progressBar = document.getElementById('donationProgressBar');
+        if (progressBar) progressBar.style.width = '100%';
+    }, 100);
+    
+    // Имитация обработки платежа (2 секунды)
+    setTimeout(() => {
+        // Закрываем окно обработки
+        if (processing.parentNode) {
+            processing.parentNode.removeChild(processing);
+        }
+        
+        // В 80% случаев "успех", в 20% - "ошибка"
+        const isSuccess = Math.random() > 0.2;
+        
+        if (isSuccess) {
+            processSuccessfulDonation(amount, message);
+        } else {
+            processFailedDonation();
+        }
+    }, 2000);
+}
+
+// Успешный донат
+function processSuccessfulDonation(amount, message) {
+    if (window.addRealDonation) {
+        window.addRealDonation(globalUserProfile.name, amount, message);
+        
+        // Обновляем статистику профиля
+        globalUserProfile.stats.donations += amount;
+        globalUserProfile.activity.lastDonation = Date.now();
+        saveGlobalProfile();
+        updateProfilePanel();
+        
+        // Показываем уведомление об успехе
+        showDonationSuccessNotification(amount, message);
+        
+        // Обновляем общий счетчик на сайте
+        if (window.updateDonationUI) {
+            window.updateDonationUI();
         }
     }
+}
+
+// Детальное уведомление об успешном донате
+function showDonationSuccessNotification(amount, message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.95);
+        border: 3px solid #00ff00;
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        z-index: 10001;
+        animation: slideDown 0.5s ease-out;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 0 40px #00ff00;
+        max-width: 400px;
+        text-align: center;
+        font-family: 'Share Tech Mono', monospace;
+    `;
+    
+    notification.innerHTML = `
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+        <div style="color: #00ff00; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">
+            ДОНАТ УСПЕШЕН!
+        </div>
+        <div style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem;">
+            ${amount}₽
+        </div>
+        <div style="color: #ccc; margin-bottom: 1.5rem;">
+            Спасибо за поддержку, ${globalUserProfile.name}!
+        </div>
+        ${message ? `<div style="background: rgba(0,255,0,0.1); padding: 1rem; border-radius: 8px; border-left: 3px solid #00ff00; margin-bottom: 1.5rem;">
+            <i class="fas fa-quote-left" style="opacity: 0.7;"></i>
+            ${message}
+        </div>` : ''}
+        <button onclick="this.parentNode.parentNode.removeChild(this.parentNode)" style="
+            background: #00ff00;
+            color: black;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        ">
+            ОК
+        </button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Автоматическое закрытие через 5 секунд
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 5000);
+}
+
+// Неудачный донат
+function processFailedDonation() {
+    showNotification('❌ Платеж не прошел. Проверьте данные и попробуйте снова.', 'error');
+    
+    const failModal = document.createElement('div');
+    failModal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.95);
+        border: 3px solid #ff4757;
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        z-index: 10001;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 0 40px #ff4757;
+        max-width: 400px;
+        text-align: center;
+        font-family: 'Share Tech Mono', monospace;
+    `;
+    
+    failModal.innerHTML = `
+        <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+        <div style="color: #ff4757; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">
+            ОШИБКА ПЛАТЕЖА
+        </div>
+        <div style="color: #ccc; margin-bottom: 1.5rem;">
+            Пожалуйста, попробуйте:<br>
+            1. Проверить баланс карты<br>
+            2. Повторить попытку<br>
+            3. Использовать другой способ оплаты
+        </div>
+        <button onclick="this.parentNode.parentNode.removeChild(this.parentNode)" style="
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        ">
+            ПОНЯТНО
+        </button>
+    `;
+    
+    document.body.appendChild(failModal);
+    
+    setTimeout(() => {
+        if (failModal.parentNode) {
+            failModal.parentNode.removeChild(failModal);
+        }
+    }, 5000);
 }
 
 // Войти/Зарегистрироваться
